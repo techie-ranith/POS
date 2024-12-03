@@ -1,5 +1,5 @@
-const BookingModel = require('../Models/BookingModel');
-const BaseController = require('./BaseController');
+const BookingModel = require('../../Models/BookingModel');
+const BaseController = require('../BaseController');
 
 class BookingController extends BaseController {
     constructor() {
