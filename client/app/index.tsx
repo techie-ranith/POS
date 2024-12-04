@@ -1,8 +1,11 @@
 import { Text, View,  StyleSheet } from 'react-native';
-
-export default function Index() {
+import {Link} from  'expo-router';
+export default function HomeScreen() {
   return (
     <View style={styles.container}>
+      <Link href="./auth/login">
+      fwkemm
+      </Link>
       <Text style={styles.text}>Home screen</Text>
     </View>
   );
