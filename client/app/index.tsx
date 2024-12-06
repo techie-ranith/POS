@@ -3,8 +3,8 @@ import {Link} from  'expo-router';
 export default function HomeScreen() {
   return (
     <View style={styles.container}>
-      <Link href="./auth/login">
-      fwkemm
+      <Link href="/auth/login">
+      Login
       </Link>
       <Text style={styles.text}>Home screen</Text>
     </View>
