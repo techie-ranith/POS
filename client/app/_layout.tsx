@@ -5,9 +5,7 @@ import "../global.css";
 export default function Layout() {
   return (
     <View className="flex-1 bg-gray-100">
-      <View className="bg-blue-500 py-4 px-6">
-        
-      </View>
+      
 
       <Stack
         screenOptions={{
