@@ -55,7 +55,7 @@ const DiscountPage = () => {
 
   return (
     <View style={{ padding: 16, backgroundColor: '#f9f9f9', flex: 1 }}>
-      <Text className="text-2xl font-bold mb-4">Discount Management</Text>
+      
 
       {/* Product Table */}
       <View className="bg-white shadow-md rounded-lg">
