@@ -22,7 +22,7 @@ const data = [
   ['Arjun Singh', 'arjun@example.com', '1234567890'],
   ['Nisha Verma', 'nisha@example.com', '1234567890'],
 ];
- 
+
 const caption = 'Showing recent membership details';
  
 const Crm = () => {
