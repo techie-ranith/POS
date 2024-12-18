@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert, Modal, Button } from 'react-native';
 
@@ -245,8 +246,9 @@ const Employee = () => {
           </View>
         </Modal>
       )}
-    </View>
-  );
-};
 
-export default Employee;
+
+ 
+
+
+
