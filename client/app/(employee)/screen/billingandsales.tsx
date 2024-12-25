@@ -76,7 +76,7 @@ const BillingandSale: React.FC = () => {
       />
 
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+        <Text style={styles.totalText}>Total : LKR {calculateTotal()}</Text>
         <Button title="Clear All" onPress={clearAll} color="red" />
       </View>
     </View>
