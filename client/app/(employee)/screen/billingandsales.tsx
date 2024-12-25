@@ -51,7 +51,7 @@ const BillingandSale = () => {
       />
 
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+        <Text style={styles.totalText}>Total: LKR {calculateTotal()}</Text>
       </View>
     </View>
   );
