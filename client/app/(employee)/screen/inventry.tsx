@@ -10,14 +10,29 @@ type Item = {
 const Inventory = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState<Item>({ name: '', category: '', quantity: 0 });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
   const addItem = () => {
     if (newItem.name && newItem.category && newItem.quantity > 0) {
-      setItems((prevItems) => [...prevItems, newItem]);
+      if (editingIndex !== null) {
+        // Update existing item
+        const updatedItems = [...items];
+        updatedItems[editingIndex] = newItem;
+        setItems(updatedItems);
+        setEditingIndex(null); // Exit edit mode
+      } else {
+        // Add new item
+        setItems((prevItems) => [...prevItems, newItem]);
+      }
       setNewItem({ name: '', category: '', quantity: 0 });
     } else {
       alert('Please fill in all fields with valid data.');
     }
+  };
+
+  const editItem = (index: number) => {
+    setNewItem(items[index]); // Load item data into input fields
+    setEditingIndex(index); // Set editing index
   };
 
   const deleteItem = (index: number) => {
@@ -54,7 +69,7 @@ const Inventory = () => {
             keyboardType="numeric"
             onChangeText={(text) => setNewItem({ ...newItem, quantity: parseInt(text) || 0 })}
           />
-          <Button title="Add Item" onPress={addItem} color="#007BFF" />
+          <Button title={editingIndex !== null ? 'Update Item' : 'Add Item'} onPress={addItem} color="#007BFF" />
         </View>
 
         <View style={styles.tableContainer}>
@@ -71,6 +86,9 @@ const Inventory = () => {
                     <Text style={styles.tableCell}>{item.name}</Text>
                     <Text style={styles.tableCell}>{item.category}</Text>
                     <Text style={styles.tableCell}>{item.quantity}</Text>
+                    <TouchableOpacity onPress={() => editItem(index)}>
+                      <Text style={styles.editButton}>Edit</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => deleteItem(index)}>
                       <Text style={styles.deleteButton}>Delete</Text>
                     </TouchableOpacity>
@@ -94,65 +112,71 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   card: {
-    width: '95%', // Increased card width
-    maxWidth: 500, // Increased max width
+    width: '95%',
+    maxWidth: 500,
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 80, // Increased padding
+    padding: 30,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 6, // Increased shadow radius
-    elevation: 6, // Increased elevation
+    shadowRadius: 6,
+    elevation: 6,
   },
   header: {
-    fontSize: 28, // Increased font size
+    fontSize: 28,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 25, // Increased bottom margin
+    marginBottom: 25,
   },
   inputContainer: {
-    marginBottom: 30, // Increased margin
+    marginBottom: 30,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    padding: 14, // Increased padding
-    borderRadius: 8, // Increased border radius
+    padding: 14,
+    borderRadius: 8,
     backgroundColor: '#f9f9f9',
-    marginBottom: 15, // Increased margin
-    fontSize: 18, // Increased font size
+    marginBottom: 15,
+    fontSize: 18,
   },
   tableContainer: {
-    marginTop: 25, // Increased margin top
+    marginTop: 25,
   },
   tableHeader: {
-    fontSize: 24, // Increased font size
+    fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 15, // Increased bottom margin
+    marginBottom: 15,
     textAlign: 'center',
   },
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 15, // Increased padding
+    paddingVertical: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   tableCell: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 16, // Increased font size
+    fontSize: 16,
+  },
+  editButton: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+    fontSize: 18,
+    marginRight: 10,
   },
   deleteButton: {
     color: '#FF3B30',
     fontWeight: 'bold',
-    fontSize: 18, // Increased font size
+    fontSize: 18,
   },
   noItemsText: {
     textAlign: 'center',
-    fontSize: 18, // Increased font size
+    fontSize: 18,
     color: '#888',
   },
 });
