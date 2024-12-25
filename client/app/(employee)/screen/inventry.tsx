@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
 type Item = {
   name: string;
@@ -19,6 +19,17 @@ const Inventory = () => {
     } else {
       alert('Please fill in all fields with valid data.');
     }
+  };
+
+  // Delete a specific item
+  const deleteItem = (index: number) => {
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems);
+  };
+
+  // Clear all items
+  const clearAllItems = () => {
+    setItems([]);
   };
 
   return (
@@ -55,17 +66,23 @@ const Inventory = () => {
         {items.length === 0 ? (
           <Text>No items found</Text>
         ) : (
-          <FlatList
-            data={items}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>{item.name}</Text>
-                <Text style={styles.tableCell}>{item.category}</Text>
-                <Text style={styles.tableCell}>{item.quantity}</Text>
-              </View>
-            )}
-          />
+          <>
+            <FlatList
+              data={items}
+              keyExtractor={(item, index) => index.toString()}
+              renderItem={({ item, index }) => (
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableCell}>{item.name}</Text>
+                  <Text style={styles.tableCell}>{item.category}</Text>
+                  <Text style={styles.tableCell}>{item.quantity}</Text>
+                  <TouchableOpacity onPress={() => deleteItem(index)}>
+                    <Text style={styles.deleteButton}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <Button title="Clear All" onPress={clearAllItems} color="red" />
+          </>
         )}
       </View>
     </ScrollView>
@@ -108,6 +125,7 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
@@ -116,6 +134,10 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 14,
+  },
+  deleteButton: {
+    color: 'red',
+    fontWeight: 'bold',
   },
 });
 
