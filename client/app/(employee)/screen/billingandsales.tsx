@@ -1,10 +1,23 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, Button, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
 
-const BillingandSale = () => {
-  const [items, setItems] = React.useState([]);
+interface Item {
+  name: string;
+  price: number;
+}
+
+const BillingandSale: React.FC = () => {
+  const [items, setItems] = React.useState<Item[]>([]);
   const [itemName, setItemName] = React.useState('');
   const [itemPrice, setItemPrice] = React.useState('');
+
+  const handlePriceChange = (text: string) => {
+    // Validate input to allow only numbers and a single decimal point
+    const numericValue = text.replace(/[^0-9.]/g, '');
+    if (!numericValue.includes('.') || numericValue.match(/\./g)?.length === 1) {
+      setItemPrice(numericValue);
+    }
+  };
 
   const addItem = () => {
     if (itemName && itemPrice) {
@@ -12,6 +25,15 @@ const BillingandSale = () => {
       setItemName('');
       setItemPrice('');
     }
+  };
+
+  const deleteItem = (index: number) => {
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems);
+  };
+
+  const clearAll = () => {
+    setItems([]);
   };
 
   const calculateTotal = () => {
@@ -33,7 +55,7 @@ const BillingandSale = () => {
           style={styles.input}
           placeholder="Item Price"
           value={itemPrice}
-          onChangeText={setItemPrice}
+          onChangeText={handlePriceChange}
           keyboardType="numeric"
         />
         <Button title="Add Item" onPress={addItem} />
@@ -41,17 +63,21 @@ const BillingandSale = () => {
 
       <FlatList
         data={items}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
+        keyExtractor={(_, index) => index.toString()}
+        renderItem={({ item, index }) => (
           <View style={styles.listItem}>
             <Text style={styles.listText}>{item.name}</Text>
             <Text style={styles.listText}>{item.price.toFixed(2)}</Text>
+            <TouchableOpacity onPress={() => deleteItem(index)}>
+              <Text style={styles.deleteButton}>Delete</Text>
+            </TouchableOpacity>
           </View>
         )}
       />
 
       <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total: LKR {calculateTotal()}</Text>
+        <Text style={styles.totalText}>Total: ${calculateTotal()}</Text>
+        <Button title="Clear All" onPress={clearAll} color="red" />
       </View>
     </View>
   );
@@ -83,12 +109,17 @@ const styles = StyleSheet.create({
   listItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
   listText: {
     fontSize: 16,
+  },
+  deleteButton: {
+    color: 'red',
+    fontSize: 14,
   },
   totalContainer: {
     marginTop: 20,
@@ -100,6 +131,7 @@ const styles = StyleSheet.create({
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
+    marginBottom: 10,
   },
 });
 
