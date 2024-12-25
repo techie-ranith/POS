@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 
 // Define a type for the customer object
 type Customer = {
@@ -33,6 +33,17 @@ const Crm = () => {
     }
   };
 
+  // Delete a specific customer
+  const deleteCustomer = (index: number) => {
+    const updatedCustomers = customers.filter((_, i) => i !== index);
+    setCustomers(updatedCustomers);
+  };
+
+  // Clear all customers
+  const clearAllCustomers = () => {
+    setCustomers([]);
+  };
+
   useEffect(() => {
     fetchCustomersFromApi(); // Fetch initial data on component mount
   }, []);
@@ -59,7 +70,12 @@ const Crm = () => {
           style={styles.input}
           placeholder="Phone"
           value={newCustomer.phone}
-          onChangeText={(text) => setNewCustomer({ ...newCustomer, phone: text })}
+          keyboardType="numeric" // Ensures the numeric keyboard is displayed
+          onChangeText={(text) => {
+            // Filter out non-numeric characters
+            const numericText = text.replace(/[^0-9]/g, '');
+            setNewCustomer({ ...newCustomer, phone: numericText });
+          }}
         />
         <Button title="Add Customer" onPress={addCustomer} />
       </View>
@@ -70,17 +86,23 @@ const Crm = () => {
         {customers.length === 0 ? (
           <Text>No customers found</Text>
         ) : (
-          <FlatList
-            data={customers}
-            keyExtractor={(item, index) => index.toString()}
-            renderItem={({ item }) => (
-              <View style={styles.tableRow}>
-                <Text style={styles.tableCell}>{item.name}</Text>
-                <Text style={styles.tableCell}>{item.email}</Text>
-                <Text style={styles.tableCell}>{item.phone}</Text>
-              </View>
-            )}
-          />
+          <>
+            <FlatList
+              data={customers}
+              keyExtractor={(_, index) => index.toString()}
+              renderItem={({ item, index }) => (
+                <View style={styles.tableRow}>
+                  <Text style={styles.tableCell}>{item.name}</Text>
+                  <Text style={styles.tableCell}>{item.email}</Text>
+                  <Text style={styles.tableCell}>{item.phone}</Text>
+                  <TouchableOpacity onPress={() => deleteCustomer(index)}>
+                    <Text style={styles.deleteButton}>Delete</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            />
+            <Button title="Clear All" onPress={clearAllCustomers} color="red" />
+          </>
         )}
       </View>
     </ScrollView>
@@ -123,6 +145,7 @@ const styles = StyleSheet.create({
   tableRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
@@ -131,6 +154,10 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
     fontSize: 14,
+  },
+  deleteButton: {
+    color: 'red',
+    fontWeight: 'bold',
   },
 });
 
