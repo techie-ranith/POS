@@ -12,7 +12,6 @@ const BillingandSale: React.FC = () => {
   const [itemPrice, setItemPrice] = React.useState('');
 
   const handlePriceChange = (text: string) => {
-    // Validate input to allow only numbers and a single decimal point
     const numericValue = text.replace(/[^0-9.]/g, '');
     if (!numericValue.includes('.') || numericValue.match(/\./g)?.length === 1) {
       setItemPrice(numericValue);
@@ -41,53 +40,70 @@ const BillingandSale: React.FC = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Billing and Sale</Text>
+    <View style={styles.screen}>
+      <View style={styles.card}>
+        <Text style={styles.header}>Billing and Sale</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Item Name"
+            value={itemName}
+            onChangeText={setItemName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Item Price"
+            value={itemPrice}
+            onChangeText={handlePriceChange}
+            keyboardType="numeric"
+          />
+          <TouchableOpacity style={styles.addButton} onPress={addItem}>
+            <Text style={styles.addButtonText}>Add Item</Text>
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Item Name"
-          value={itemName}
-          onChangeText={setItemName}
+        <FlatList
+          data={items}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <View style={styles.listItem}>
+              <Text style={styles.listText}>{item.name}</Text>
+              <Text style={styles.listText}>{item.price.toFixed(2)}</Text>
+              <TouchableOpacity onPress={() => deleteItem(index)}>
+                <Text style={styles.deleteButton}>Delete</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Item Price"
-          value={itemPrice}
-          onChangeText={handlePriceChange}
-          keyboardType="numeric"
-        />
-        <Button title="Add Item" onPress={addItem} />
-      </View>
 
-      <FlatList
-        data={items}
-        keyExtractor={(_, index) => index.toString()}
-        renderItem={({ item, index }) => (
-          <View style={styles.listItem}>
-            <Text style={styles.listText}>{item.name}</Text>
-            <Text style={styles.listText}>{item.price.toFixed(2)}</Text>
-            <TouchableOpacity onPress={() => deleteItem(index)}>
-              <Text style={styles.deleteButton}>Delete</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-
-      <View style={styles.totalContainer}>
-        <Text style={styles.totalText}>Total : LKR {calculateTotal()}</Text>
-        <Button title="Clear All" onPress={clearAll} color="red" />
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Total: LKR {calculateTotal()}</Text>
+          <TouchableOpacity style={styles.clearButton} onPress={clearAll}>
+            <Text style={styles.clearButtonText}>Clear All</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 20,
     backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
   header: {
     fontSize: 24,
@@ -104,7 +120,18 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     borderRadius: 5,
-    backgroundColor: '#fff',
+    backgroundColor: '#f9f9f9',
+  },
+  addButton: {
+    backgroundColor: '#007bff',
+    padding: 12,
+    borderRadius: 5,
+    alignItems: 'center',
+  },
+  addButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
   listItem: {
     flexDirection: 'row',
@@ -123,15 +150,22 @@ const styles = StyleSheet.create({
   },
   totalContainer: {
     marginTop: 20,
-    padding: 10,
-    backgroundColor: '#ddd',
-    borderRadius: 5,
     alignItems: 'center',
   },
   totalText: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 10,
+  },
+  clearButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 
