@@ -50,6 +50,12 @@ const Crm = () => {
     }
   };
 
+  const clearAllCustomers = () => {
+    setCustomers([]);
+    setNewCustomer({ name: '', email: '', phone: '' });
+    setEditingIndex(null);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.formContainer}>
@@ -108,6 +114,11 @@ const Crm = () => {
             </View>
           )}
         />
+        {customers.length > 0 && (
+          <TouchableOpacity style={[styles.button, styles.clearAllButton]} onPress={clearAllCustomers}>
+            <Text style={styles.buttonText}>Clear All</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -151,6 +162,9 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     alignItems: 'center',
     marginBottom: 15,
+  },
+  clearAllButton: {
+    backgroundColor: '#6c757d',
   },
   buttonText: {
     color: '#fff',
