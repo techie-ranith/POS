@@ -27,6 +27,8 @@ ChartJS.register(
 );
 
 const SalesChart: React.FC = () => {
+  // Chart data and options remain the same as in the original code.
+
   // Line Chart Data
   const lineData = {
     labels: ["January", "February", "March", "April", "May", "June"],
@@ -86,7 +88,7 @@ const SalesChart: React.FC = () => {
     },
   };
 
-  // Pie Chart Data for Age Demographic
+  // Pie Chart Data
   const pieData = {
     labels: ["18-24", "25-34", "35-44", "45-54", "55+"],
     datasets: [
@@ -123,7 +125,7 @@ const SalesChart: React.FC = () => {
     },
   };
 
-  // Bar Chart Data for Tax Collected Per Year
+  // Bar Chart Data
   const barData = {
     labels: ["2019", "2020", "2021", "2022", "2023"],
     datasets: [
@@ -178,7 +180,6 @@ const SalesChart: React.FC = () => {
     },
   };
 
-  // Horizontal Bar Chart Data for Payment Method Breakdown
   const paymentData = {
     labels: ["Credit Card", "Debit Card", "PayPal", "Bank Transfer", "Cash"],
     datasets: [
@@ -231,21 +232,21 @@ const SalesChart: React.FC = () => {
       },
     },
   };
-  
+
   return (
-    <div className="h-screen overflow-y-auto bg-gray-50">
+    <div className="h-screen overflow-y-auto bg-gray-50 p-6">
       <h1 className="text-3xl font-bold text-center py-4">Retail Store Dashboard</h1>
-      <div className="flex flex-col items-center space-y-6">
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-4 rounded shadow">
           <Line data={lineData} options={lineOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[60%] lg:w-[40%] bg-white p-4 rounded shadow">
+        <div className="bg-white p-4 rounded shadow">
           <Pie data={pieData} options={pieOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
+        <div className="bg-white p-4 rounded shadow">
           <Bar data={barData} options={barOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
+        <div className="bg-white p-4 rounded shadow">
           <Bar data={paymentData} options={paymentOptions} />
         </div>
       </div>

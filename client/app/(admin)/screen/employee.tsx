@@ -57,34 +57,6 @@ const EmployeePage = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    if (!id) {
-      Alert.alert('Error', 'No employee selected for deletion.');
-      return;
-    }
-  
-    Alert.alert(
-      'Confirm Deletion',
-      'Are you sure you want to delete this employee?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Delete',
-          style: 'destructive',
-          onPress: () => {
-            setEmployees((prev) => {
-              const updatedList = prev.filter((emp) => emp.id !== id);
-              console.log('Updated Employees List:', updatedList);
-              return updatedList;
-            });
-            setIsModalVisible(false); // Ensure the modal closes after deletion
-          },
-        },
-      ]
-    );
-  };
-  
-  
   const handleAddEmployee = () => {
     if (newEmployee.name && newEmployee.position && newEmployee.department) {
       setEmployees((prev) => [
@@ -96,6 +68,10 @@ const EmployeePage = () => {
     } else {
       Alert.alert('Error', 'Please fill out all required fields (name, position, department).');
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setEmployees((prev) => prev.filter((employee) => employee.id !== id));
   };
 
   return (
@@ -112,10 +88,26 @@ const EmployeePage = () => {
         data={filteredEmployees}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity style={styles.employeeCard} onPress={() => handleSelectEmployee(item)}>
-            <Text style={styles.employeeName}>{item.name}</Text>
+          <View style={styles.employeeCard}>
+            <View style={styles.employeeRow}>
+              <TouchableOpacity
+                onPress={() => handleSelectEmployee(item)}
+                style={{ flex: 1 }}
+              >
+                <Text style={styles.employeeName}>{item.name}</Text>
+              </TouchableOpacity>
+              <Button
+                title="Edit"
+                onPress={() => handleSelectEmployee(item)}
+              />
+              <Button
+                title="Delete"
+                color="#FF3B30"
+                onPress={() => handleDelete(item.id)}
+              />
+            </View>
             <Text style={styles.employeePosition}>{item.position}</Text>
-          </TouchableOpacity>
+          </View>
         )}
         ListEmptyComponent={<Text style={styles.noEmployeesText}>No employees found</Text>}
       />
@@ -171,13 +163,6 @@ const EmployeePage = () => {
                 <View style={styles.modalActions}>
                   <Button title="Save" onPress={handleSave} />
                   <Button title="Cancel" color="#FF3B30" onPress={() => setIsModalVisible(false)} />
-                  <Button
-                    title="Delete"
-                    color="#FF3B30"
-                    onPress={() => handleDelete(selectedEmployee?.id || '')}
-                    />
-
-
                 </View>
               </>
             )}
@@ -264,6 +249,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
+  },
+  employeeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   employeeName: {
     fontSize: 18,
