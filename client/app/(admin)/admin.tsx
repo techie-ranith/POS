@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { TouchableOpacity, Text } from 'react-native'; // Import TouchableOpacity and Text
+import { TouchableOpacity, Text, View } from 'react-native'; // Import TouchableOpacity and Text
 
 import Overview from './screen/overview';
 import Inventry from './screen/inventry';
@@ -10,6 +10,17 @@ import Discount from './screen/discount';
 import Crm from './screen/crm';
 import BillingandSale from './screen/billingandsales';
 import Profile from './screen/profile';
+
+
+import {
+  Button,
+  ButtonText,
+  ButtonSpinner,
+  ButtonIcon,
+  ButtonGroup,
+} from '@/components/ui/button';
+
+import { EditIcon } from '@/components/ui/icon';
 
 const Drawer = createDrawerNavigator();
 
@@ -89,7 +100,17 @@ function RootStack() {
 
 export default function App() {
   return (
-   
+    <>
       <RootStack />
+      <View className='felx items-end justify-center'>
+      <Button
+      size='lg'
+      className='rounded-full border-2 p-3.5 mb-4 mr-4'
+    >
+      <ButtonIcon as={EditIcon} />
+    </Button>
+      </View>
+
+    </>
   );
 }
