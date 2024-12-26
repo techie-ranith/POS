@@ -1,296 +1,280 @@
 import React, { useState } from 'react';
-import { View, TextInput, TouchableOpacity, Text, Modal, ScrollView, GestureResponderEvent } from 'react-native';
+import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import TableComponent from "@/components/table";
+
+type Item = {
+  name: string;
+  category: string;
+  quantity: number;
+};
 
 const Inventory = () => {
-  const [items, setItems] = useState([
-    { id: '1', name: 'Item A', stock: 10 },
-    { id: '2', name: 'Item B', stock: 5 },
-    { id: '3', name: 'Item C', stock: 20 },
-  ]);
-  const [searchText, setSearchText] = useState('');
-  const [isEditModalVisible, setEditModalVisible] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
-  const [isAddModalVisible, setAddModalVisible] = useState(false);
-  const [newItem, setNewItem] = useState({ id: '', name: '', stock: '' });
+  const [items, setItems] = useState<Item[]>([]);
+  const [pendingItems, setPendingItems] = useState<Item[]>([]);
+  const [newItem, setNewItem] = useState<Item>({ name: '', category: '', quantity: 0 });
+  const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(searchText.toLowerCase())
-  );
-
-  const handleEdit = (item:any) => {
-    setCurrentItem(item);
-    setEditModalVisible(true);
+  const addItem = () => {
+    if (newItem.name && newItem.category && newItem.quantity > 0) {
+      if (editingIndex !== null) {
+        const updatedItems = [...pendingItems];
+        updatedItems[editingIndex] = newItem;
+        setPendingItems(updatedItems);
+        setEditingIndex(null);
+      } else {
+        setPendingItems((prevItems) => [...prevItems, newItem]);
+      }
+      setNewItem({ name: '', category: '', quantity: 0 });
+    } else {
+      alert('Please fill in all fields with valid data.');
+    }
   };
 
-  /*const handleSaveEdit = () => {
-    setItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === currentItem.id ? currentItem : item
-      )
-    );
-    setEditModalVisible(false);
-  };*/
-
-  /*const handleDelete = (id) => {
-    setItems(items.filter((item) => item.id !== id));
+  const editItem = (index: number) => {
+    setNewItem(pendingItems[index]);
+    setEditingIndex(index);
   };
 
-  const handleAdd = () => {
-    setItems([...items, { ...newItem, id: String(items.length + 1) }]);
-    setNewItem({ id: '', name: '', stock: '' });
-    setAddModalVisible(false);
-  };*/
-
-  const closeEditModal = () => {
-    setEditModalVisible(false);
-    setCurrentItem(null);
+  const deleteItem = (index: number) => {
+    const updatedItems = pendingItems.filter((_, i) => i !== index);
+    setPendingItems(updatedItems);
   };
 
-  const closeAddModal = () => {
-    setAddModalVisible(false);
-    setNewItem({ id: '', name: '', stock: '' });
+  const clearPendingItems = () => {
+    setPendingItems([]);
   };
 
-  function handleDelete(id: string): void {
-    throw new Error('Function not implemented.');
-  }
+  const confirmChanges = () => {
+    setItems((prevItems) => [...prevItems, ...pendingItems]);
+    setPendingItems([]);
+    alert('Changes confirmed!');
+  };
 
-  function handleAdd(event: GestureResponderEvent): void {
-    throw new Error('Function not implemented.');
-  }
+  const clearAllItems = () => {
+    setItems([]);
+  };
+
+  const caption = 'Inventory Screen';
+  const headers = ['Item Name', 'Category', 'Quantity'];
+  const data = items.map((item) => [item.name, item.category, item.quantity.toString()]);
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: '#f9f9f9' }}>
-      {/* Search Bar and Add Button */}
-      <View style={{ flexDirection: 'row', marginBottom: 16 }}>
-        <TextInput
-          placeholder="Search items"
-          value={searchText}
-          onChangeText={setSearchText}
-          style={{
-            flex: 1,
-            backgroundColor: '#fff',
-            padding: 10,
-            borderRadius: 8,
-            borderWidth: 1,
-            borderColor: '#ccc',
-          }}
-        />
-        <TouchableOpacity
-          onPress={() => setAddModalVisible(true)}
-          style={{
-            marginLeft: 8,
-            backgroundColor: '#4CAF50',
-            padding: 10,
-            borderRadius: 8,
-          }}
-        >
-          <Text style={{ color: '#fff', fontWeight: 'bold' }}>Add Item</Text>
-        </TouchableOpacity>
+    <View style={styles.container}>
+      {/* Inventory Management Section */}
+      <View style={styles.card}>
+        <Text style={styles.header}>Inventory Management</Text>
+
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Item Name"
+            value={newItem.name}
+            onChangeText={(text) => setNewItem({ ...newItem, name: text })}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Category"
+            value={newItem.category}
+            onChangeText={(text) => setNewItem({ ...newItem, category: text })}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Quantity"
+            value={newItem.quantity.toString()}
+            keyboardType="numeric"
+            onChangeText={(text) => setNewItem({ ...newItem, quantity: parseInt(text) || 0 })}
+          />
+          <Button title={editingIndex !== null ? 'Update Item' : 'Add Item'} onPress={addItem} color="#007BFF" />
+        </View>
+
+        <View style={styles.tableContainer}>
+          <Text style={styles.tableHeader}>Pending Inventory List</Text>
+          {pendingItems.length === 0 ? (
+            <Text style={styles.noItemsText}>No items found</Text>
+          ) : (
+            <ScrollView style={styles.scrollView}>
+              <View style={styles.tableHeaderRow}>
+                <Text style={styles.tableHeaderCell}>Item Name</Text>
+                <Text style={styles.tableHeaderCell}>Category</Text>
+                <Text style={styles.tableHeaderCell}>Quantity</Text>
+                <Text style={styles.tableHeaderCell}>Actions</Text>
+              </View>
+
+              <FlatList
+                data={pendingItems}
+                keyExtractor={(item, index) => index.toString()}
+                renderItem={({ item, index }) => (
+                  <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{item.name}</Text>
+                    <Text style={styles.tableCell}>{item.category}</Text>
+                    <Text style={styles.tableCell}>{item.quantity}</Text>
+                    <View style={styles.actionButtons}>
+                      <TouchableOpacity onPress={() => editItem(index)}>
+                        <Text style={styles.editButton}>Edit</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => deleteItem(index)}>
+                        <Text style={styles.deleteButton}>Delete</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
+              />
+            </ScrollView>
+          )}
+          {pendingItems.length > 0 && (
+            <Button title="Clear All" onPress={clearPendingItems} color="#FF3B30" />
+          )}
+        </View>
+
+        {pendingItems.length > 0 && (
+          <TouchableOpacity style={styles.confirmButton} onPress={confirmChanges}>
+            <Text style={styles.confirmButtonText}>Confirm</Text>
+          </TouchableOpacity>
+        )}
       </View>
 
-      {/* Items Table */}
-      <ScrollView>
-        <View>
-          {/* Table Header */}
-          <View
-            style={{
-              flexDirection: 'row',
-              backgroundColor: '#ddd',
-              padding: 8,
-              borderRadius: 8,
-              marginBottom: 8,
-            }}
-          >
-            <Text style={{ flex: 1, fontWeight: 'bold' }}>ItemID</Text>
-            <Text style={{ flex: 2, fontWeight: 'bold' }}>Item Name</Text>
-            <Text style={{ flex: 1, fontWeight: 'bold' }}>Stock</Text>
-            <Text style={{ flex: 2, fontWeight: 'bold' }}>Actions</Text>
-          </View>
-
-          {/* Table Rows */}
-          {filteredItems.map((item) => (
-            <View
-              key={item.id}
-              style={{
-                flexDirection: 'row',
-                padding: 8,
-                borderBottomWidth: 1,
-                borderColor: '#ccc',
-                backgroundColor: '#fff',
-              }}
-            >
-              <Text style={{ flex: 1 }}>{item.id}</Text>
-              <Text style={{ flex: 2 }}>{item.name}</Text>
-              <Text style={{ flex: 1 }}>{item.stock}</Text>
-              <View style={{ flex: 2, flexDirection: 'row' }}>
-                <TouchableOpacity
-                  onPress={() => handleEdit(item)}
-                  style={{
-                    marginRight: 8,
-                    backgroundColor: '#FFA500',
-                    padding: 6,
-                    borderRadius: 4,
-                  }}
-                >
-                  <Text style={{ color: '#fff' }}>Edit</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => handleDelete(item.id)}
-                  style={{
-                    backgroundColor: '#FF0000',
-                    padding: 6,
-                    borderRadius: 4,
-                  }}
-                >
-                  <Text style={{ color: '#fff' }}>Delete</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-
-      {/* Edit Modal */}
-      <Modal visible={isEditModalVisible} transparent animationType="slide">
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          <View
-            style={{
-              width: '80%',
-              backgroundColor: '#fff',
-              padding: 20,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Edit Item</Text>
-            <TextInput
-              placeholder="Item Name"
-              
-              style={{
-                backgroundColor: '#f0f0f0',
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            />
-            <TextInput
-              placeholder="Stock"
-              
-              style={{
-                backgroundColor: '#f0f0f0',
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <TouchableOpacity
-                onPress={handleEdit}
-                style={{
-                  backgroundColor: '#4CAF50',
-                  padding: 10,
-                  borderRadius: 8,
-                  flex: 1,
-                  marginRight: 10,
-                }}
-              >
-                <Text style={{ color: '#fff', textAlign: 'center' }}>Save</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={closeEditModal}
-                style={{
-                  backgroundColor: '#FF0000',
-                  padding: 10,
-                  borderRadius: 8,
-                  flex: 1,
-                }}
-              >
-                <Text style={{ color: '#fff', textAlign: 'center' }}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Add Modal */}
-      <Modal visible={isAddModalVisible} transparent animationType="slide">
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          }}
-        >
-          <View
-            style={{
-              width: '80%',
-              backgroundColor: '#fff',
-              padding: 20,
-              borderRadius: 8,
-            }}
-          >
-            <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>Add Item</Text>
-            <TextInput
-              placeholder="Item Name"
-              value={newItem.name}
-              onChangeText={(text) => setNewItem({ ...newItem, name: text })}
-              style={{
-                backgroundColor: '#f0f0f0',
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            />
-            <TextInput
-              placeholder="Stock"
-              value={newItem.stock}
-              keyboardType="numeric"
-              
-              style={{
-                backgroundColor: '#f0f0f0',
-                padding: 10,
-                borderRadius: 8,
-                marginBottom: 10,
-              }}
-            />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <TouchableOpacity
-                onPress={handleAdd}
-                style={{
-                  backgroundColor: '#4CAF50',
-                  padding: 10,
-                  borderRadius: 8,
-                  flex: 1,
-                  marginRight: 10,
-                }}
-              >
-                <Text style={{ color: '#fff', textAlign: 'center' }}>Add</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                onPress={closeAddModal}
-                style={{
-                  backgroundColor: '#FF0000',
-                  padding: 10,
-                  borderRadius: 8,
-                  flex: 1,
-                }}
-              >
-                <Text style={{ color: '#fff', textAlign: 'center' }}>Cancel</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {/* TableComponent Section */}
+      <View style={styles.tableComponentContainer}>
+        <TableComponent headers={headers} data={data} caption={caption} />
+        {items.length > 0 && (
+          <TouchableOpacity style={styles.clearButton} onPress={clearAllItems}>
+            <Text style={styles.clearButtonText}>Clear All</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    padding: 20,
+    backgroundColor: '#f5f5f5',
+  },
+  card: {
+    flex: 1,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    padding: 20,
+    marginRight: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 6,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+  inputContainer: {
+    marginBottom: 30,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    padding: 14,
+    borderRadius: 8,
+    backgroundColor: '#f9f9f9',
+    marginBottom: 15,
+    fontSize: 18,
+  },
+  tableContainer: {
+    marginTop: 25,
+    maxHeight: 250,
+  },
+  scrollView: {
+    flexGrow: 0,
+  },
+  tableHeader: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  tableHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 10,
+    backgroundColor: '#f0f0f0',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  tableHeaderCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  tableRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  tableCell: {
+    flex: 1,
+    textAlign: 'center',
+    fontSize: 16,
+  },
+  actionButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    flex: 1,
+  },
+  editButton: {
+    color: '#007BFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+    marginRight: 10,
+  },
+  deleteButton: {
+    color: '#FF3B30',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  noItemsText: {
+    textAlign: 'center',
+    fontSize: 18,
+    color: '#888',
+  },
+  confirmButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#28A745',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  tableComponentContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  clearButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#FF3B30',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+});
 
 export default Inventory;
