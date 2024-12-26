@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import TableComponent from "@/components/table";
 
 type Item = {
   name: string;
@@ -39,17 +40,27 @@ const Inventory = () => {
     setPendingItems(updatedItems);
   };
 
-  const clearAllItems = () => {
+  const clearPendingItems = () => {
     setPendingItems([]);
   };
 
   const confirmChanges = () => {
-    setItems(pendingItems);
+    setItems((prevItems) => [...prevItems, ...pendingItems]);
+    setPendingItems([]);
     alert('Changes confirmed!');
   };
 
+  const clearAllItems = () => {
+    setItems([]);
+  };
+
+  const caption = 'Inventory Screen';
+  const headers = ['Item Name', 'Category', 'Quantity'];
+  const data = items.map((item) => [item.name, item.category, item.quantity.toString()]);
+
   return (
     <View style={styles.container}>
+      {/* Inventory Management Section */}
       <View style={styles.card}>
         <Text style={styles.header}>Inventory Management</Text>
 
@@ -77,7 +88,7 @@ const Inventory = () => {
         </View>
 
         <View style={styles.tableContainer}>
-          <Text style={styles.tableHeader}>Inventory List</Text>
+          <Text style={styles.tableHeader}>Pending Inventory List</Text>
           {pendingItems.length === 0 ? (
             <Text style={styles.noItemsText}>No items found</Text>
           ) : (
@@ -111,14 +122,23 @@ const Inventory = () => {
             </ScrollView>
           )}
           {pendingItems.length > 0 && (
-            <Button title="Clear All" onPress={clearAllItems} color="#FF3B30" />
+            <Button title="Clear All" onPress={clearPendingItems} color="#FF3B30" />
           )}
         </View>
 
-        {/* Confirm Button */}
         {pendingItems.length > 0 && (
           <TouchableOpacity style={styles.confirmButton} onPress={confirmChanges}>
             <Text style={styles.confirmButtonText}>Confirm</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+
+      {/* TableComponent Section */}
+      <View style={styles.tableComponentContainer}>
+        <TableComponent headers={headers} data={data} caption={caption} />
+        {items.length > 0 && (
+          <TouchableOpacity style={styles.clearButton} onPress={clearAllItems}>
+            <Text style={styles.clearButtonText}>Clear All</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -129,17 +149,18 @@ const Inventory = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'flex-start', // Align items to the left
-    justifyContent: 'center', // Center items vertically
-    padding: 20,             // Add some padding to the container
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+    padding: 20,
     backgroundColor: '#f5f5f5',
   },
   card: {
-    width: '95%',
-    maxWidth: 500,
+    flex: 1,
     backgroundColor: '#fff',
     borderRadius: 8,
-    padding: 30,
+    padding: 20,
+    marginRight: 10,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
@@ -234,6 +255,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   confirmButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  tableComponentContainer: {
+    flex: 1,
+    padding: 10,
+  },
+  clearButton: {
+    marginTop: 10,
+    padding: 10,
+    backgroundColor: '#FF3B30',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  clearButtonText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
