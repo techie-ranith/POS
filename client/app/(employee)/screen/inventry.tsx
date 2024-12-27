@@ -44,10 +44,32 @@ const Inventory = () => {
     setPendingItems([]);
   };
 
-  const confirmChanges = () => {
-    setItems((prevItems) => [...prevItems, ...pendingItems]);
-    setPendingItems([]);
-    alert('Changes confirmed!');
+  const confirmChanges = async () => {
+    if (pendingItems.length === 0) {
+      alert("No items to confirm.");
+      return;
+    }
+
+    try {
+      const response = await fetch("https://example.com/api/inventory", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(pendingItems),
+      });
+
+      if (response.ok) {
+        setItems((prevItems) => [...prevItems, ...pendingItems]);
+        setPendingItems([]);
+        alert("Changes confirmed and data sent to the database!");
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to send data: ${errorData.message}`);
+      }
+    } catch (error) {
+      alert(`An error occurred: ${error.message}`);
+    }
   };
 
   const clearAllItems = () => {
