@@ -68,7 +68,7 @@ const Inventory = () => {
         alert(`Failed to send data: ${errorData.message}`);
       }
     } catch (error) {
-      alert(`An error occurred: ${error.message}`);
+      alert(`An error occurred: $ {error.message}`);
     }
   };
 
