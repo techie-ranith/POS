@@ -1,11 +1,19 @@
-import React, { JSXElementConstructor, ReactElement, useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet, ListRenderItemInfo, GestureResponderEvent } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
+
+type Item = {
+  id: string;
+  name: string;
+  pricePerUnit: number;
+  weight: number;
+  totalPrice: number;
+};
 
 const BillingAndScale = () => {
   const [itemName, setItemName] = useState('');
   const [itemPrice, setItemPrice] = useState('');
   const [itemWeight, setItemWeight] = useState('');
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState<Item[]>([]);
 
   const handleAddItem = () => {
     if (!itemName || !itemPrice || !itemWeight) {
@@ -22,7 +30,7 @@ const BillingAndScale = () => {
     }
 
     const totalPrice = pricePerUnit * weight;
-    const newItem = {
+    const newItem: Item = {
       id: Date.now().toString(),
       name: itemName,
       pricePerUnit,
@@ -30,24 +38,24 @@ const BillingAndScale = () => {
       totalPrice,
     };
 
-    
+    setItems((prevItems) => [...prevItems, newItem]);
+    setItemName('');
+    setItemPrice('');
+    setItemWeight('');
   };
-
-  
 
   const handleReset = () => {
     setItems([]);
   };
 
-  
-
-  function renderItem(info: ListRenderItemInfo<never>): ReactElement<any, string | JSXElementConstructor<any>> | null {
-    throw new Error('Function not implemented.');
-  }
-
-  function handleFinalize(event: GestureResponderEvent): void {
-    throw new Error('Function not implemented.');
-  }
+  const renderItem = ({ item }: { item: Item }) => (
+    <View style={styles.itemRow}>
+      <Text style={styles.itemText}>{item.name}</Text>
+      <Text style={styles.itemText}>{item.pricePerUnit.toFixed(2)}</Text>
+      <Text style={styles.itemText}>{item.weight.toFixed(2)}</Text>
+      <Text style={styles.itemText}>{item.totalPrice.toFixed(2)}</Text>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -82,7 +90,7 @@ const BillingAndScale = () => {
       {/* Item List */}
       <FlatList
         data={items}
-        
+        keyExtractor={(item) => item.id}
         renderItem={renderItem}
         ListHeaderComponent={() =>
           items.length > 0 && (
@@ -91,7 +99,6 @@ const BillingAndScale = () => {
               <Text style={styles.headerText}>Price/kg</Text>
               <Text style={styles.headerText}>Weight</Text>
               <Text style={styles.headerText}>Total</Text>
-              <Text style={styles.headerText}></Text>
             </View>
           )
         }
@@ -99,14 +106,9 @@ const BillingAndScale = () => {
 
       {/* Actions */}
       {items.length > 0 && (
-        <View style={styles.actionsRow}>
-          <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
-            <Text style={styles.buttonText}>Reset</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleFinalize} style={styles.finalizeButton}>
-            <Text style={styles.buttonText}>Finalize</Text>
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
+          <Text style={styles.buttonText}>Reset</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -154,11 +156,6 @@ const styles = StyleSheet.create({
     flex: 1,
     textAlign: 'center',
   },
-  deleteButton: {
-    backgroundColor: '#f44336',
-    padding: 8,
-    borderRadius: 8,
-  },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -171,26 +168,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
   },
-  actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 16,
-  },
   resetButton: {
     backgroundColor: '#ff9800',
     padding: 12,
     borderRadius: 8,
-    flex: 1,
-    marginRight: 8,
     alignItems: 'center',
-  },
-  finalizeButton: {
-    backgroundColor: '#2196F3',
-    padding: 12,
-    borderRadius: 8,
-    flex: 1,
-    marginLeft: 8,
-    alignItems: 'center',
+    marginTop: 16,
   },
 });
 
