@@ -152,6 +152,9 @@ export default function App() {
     };
 
     checkAuth();
+    const intervalId = setInterval(checkAuth, 9000);
+
+    return () => clearInterval(intervalId);
   }, []);
 
 
