@@ -12,8 +12,9 @@ export default function LoginPage() {
       alert('Please fill in both email and password');
       return;
     }
-
+  
     try {
+      // Send the login request to the backend
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/login`, {
         method: 'POST',
         headers: {
@@ -24,30 +25,36 @@ export default function LoginPage() {
           password,
         }),
       });
-
+  
       // Check if the response is successful
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Login failed');
-        alert('Failed');
+        alert(data.message || 'Login failed');
+        return;  // Exit early if login fails
       }
-
+  
+      // Parse the response data
       const data = await response.json();
-
-      // If login is successful, you can save the token and handle redirection
+  
+      // If login is successful, store the token and handle redirection
       if (data.token) {
-        alert('Success');
+        alert('Login successful');
         
+        // Store the token in localStorage or sessionStorage (depending on your needs)
+        localStorage.setItem('authToken', data.token);
+  
+        // Redirect user based on their role
+        window.location.href = data.redirectTo;
       } else {
-        
-        alert('Failed');
+        alert('Failed to login');
       }
     } catch (error) {
-      // Handle errors (network issues, invalid credentials, etc.)
-      console.error(error);
-     
+      // Handle errors (network issues, etc.)
+      console.error('Login error:', error);
+      alert('An error occurred, please try again later');
     }
   };
+  
 
   return (
     <View className="flex-1 bg-gray-100 justify-center items-center px-6">
