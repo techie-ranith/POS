@@ -1,15 +1,17 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, Button, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
 
 interface Item {
   name: string;
   price: number;
+  quantity: number;
 }
 
 const BillingandSale: React.FC = () => {
   const [items, setItems] = React.useState<Item[]>([]);
   const [itemName, setItemName] = React.useState('');
   const [itemPrice, setItemPrice] = React.useState('');
+  const [itemQuantity, setItemQuantity] = React.useState('');
 
   const handlePriceChange = (text: string) => {
     const numericValue = text.replace(/[^0-9.]/g, '');
@@ -18,11 +20,20 @@ const BillingandSale: React.FC = () => {
     }
   };
 
+  const handleQuantityChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, ''); // Only allow numbers
+    setItemQuantity(numericValue);
+  };
+
   const addItem = () => {
-    if (itemName && itemPrice) {
-      setItems([...items, { name: itemName, price: parseFloat(itemPrice) }]);
+    if (itemName && itemPrice && itemQuantity) {
+      setItems([
+        ...items,
+        { name: itemName, price: parseFloat(itemPrice), quantity: parseInt(itemQuantity, 10) },
+      ]);
       setItemName('');
       setItemPrice('');
+      setItemQuantity('');
     }
   };
 
@@ -36,7 +47,9 @@ const BillingandSale: React.FC = () => {
   };
 
   const calculateTotal = () => {
-    return items.reduce((total, item) => total + item.price, 0).toFixed(2);
+    return items
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .toFixed(2);
   };
 
   return (
@@ -57,6 +70,13 @@ const BillingandSale: React.FC = () => {
             onChangeText={handlePriceChange}
             keyboardType="numeric"
           />
+          <TextInput
+            style={styles.input}
+            placeholder="Quantity"
+            value={itemQuantity}
+            onChangeText={handleQuantityChange}
+            keyboardType="numeric"
+          />
           <TouchableOpacity style={styles.addButton} onPress={addItem}>
             <Text style={styles.addButtonText}>Add Item</Text>
           </TouchableOpacity>
@@ -68,7 +88,10 @@ const BillingandSale: React.FC = () => {
           renderItem={({ item, index }) => (
             <View style={styles.listItem}>
               <Text style={styles.listText}>{item.name}</Text>
-              <Text style={styles.listText}>{item.price.toFixed(2)}</Text>
+              <Text style={styles.listText}>
+                LKR {item.price.toFixed(2)} x {item.quantity} = LKR{' '}
+                {(item.price * item.quantity).toFixed(2)}
+              </Text>
               <TouchableOpacity onPress={() => deleteItem(index)}>
                 <Text style={styles.deleteButton}>Delete</Text>
               </TouchableOpacity>
