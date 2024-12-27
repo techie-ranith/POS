@@ -76,12 +76,12 @@ export default function LoginPage() {
           <Text className="text-center text-white text-base font-medium">Login</Text>
         </TouchableOpacity>
 
-        <Text className="text-center text-gray-600 text-sm mt-4">
+        {/* <Text className="text-center text-gray-600 text-sm mt-4">
           Don't have an account?{' '}
           <Link href="/auth/signup">
             <Text className="text-blue-500 underline">Sign up</Text>
           </Link>
-        </Text>
+        </Text> */}
       </View>
     </View>
   );
