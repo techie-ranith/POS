@@ -20,7 +20,7 @@ interface CrmProps {
 const Crm: React.FC<CrmProps> = ({ headers, data, caption }) => {
   return (
     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-      <Text className='text-xl font-bold'>Crm Screen</Text>
+      <Text className='text-xl font-bold'>Screen</Text>
       <Table className="w-full border-2">
         {/* Render Table Headers */}
         <TableHeader>

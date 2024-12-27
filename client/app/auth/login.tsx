@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity} from 'react-native';
 import { useState } from 'react';
 import { Link } from 'expo-router';
-
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -12,8 +12,9 @@ export default function LoginPage() {
       alert('Please fill in both email and password');
       return;
     }
-
+  
     try {
+      // Send the login request to the backend
       const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/login`, {
         method: 'POST',
         headers: {
@@ -24,30 +25,38 @@ export default function LoginPage() {
           password,
         }),
       });
-
-      // Check if the response is successful
+  
+  
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.message || 'Login failed');
-        alert('Failed');
+        alert(data.message || 'Login failed');
+        return;  
       }
-
+  
+    
       const data = await response.json();
-
-      // If login is successful, you can save the token and handle redirection
+     
       if (data.token) {
-        alert('Success');
-        
+        // alert('Login successful');
+        AsyncStorage.setItem('token', data.token)
+        .then(() => {
+          console.log("Token stored successfully!");
+        })
+        AsyncStorage.setItem('role', data.role)
+        .then(() => {
+          console.log("Role stored successfully!");
+        })
+        window.location.href = data.redirectTo;
       } else {
-        
-        alert('Failed');
+        alert('Failed to login');
       }
     } catch (error) {
-      // Handle errors (network issues, invalid credentials, etc.)
-      console.error(error);
-     
+      
+      console.error('Login error:', error);
+      alert('An error occurred, please try again later');
     }
   };
+  
 
   return (
     <View className="flex-1 bg-gray-100 justify-center items-center px-6">
@@ -76,12 +85,12 @@ export default function LoginPage() {
           <Text className="text-center text-white text-base font-medium">Login</Text>
         </TouchableOpacity>
 
-        <Text className="text-center text-gray-600 text-sm mt-4">
+        {/* <Text className="text-center text-gray-600 text-sm mt-4">
           Don't have an account?{' '}
           <Link href="/auth/signup">
             <Text className="text-blue-500 underline">Sign up</Text>
           </Link>
-        </Text>
+        </Text> */}
       </View>
     </View>
   );
