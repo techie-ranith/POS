@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, Image, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 
 const Profile = () => {
   const [profile, setProfile] = useState({
@@ -10,62 +10,67 @@ const Profile = () => {
   });
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Profile</Text>
-      <Image
-        style={styles.profileImage}
-        source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual profile image URL
-      />
-      <View style={styles.infoContainer}>
-        <Text style={styles.label}>Name:</Text>
-        <Text style={styles.value}>{profile.name}</Text>
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+    >
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.header}>Profile</Text>
+        <Image
+          style={styles.profileImage}
+          source={{ uri: 'https://via.placeholder.com/150' }} // Replace with actual profile image URL
+        />
+        <View style={styles.infoContainer}>
+          <Text style={styles.label}>Name:</Text>
+          <Text style={styles.value}>{profile.name}</Text>
 
-        <Text style={styles.label}>Email:</Text>
-        <Text style={styles.value}>{profile.email}</Text>
+          <Text style={styles.label}>Email:</Text>
+          <Text style={styles.value}>{profile.email}</Text>
 
-        <Text style={styles.label}>Phone:</Text>
-        <Text style={styles.value}>{profile.phone}</Text>
+          <Text style={styles.label}>Phone:</Text>
+          <Text style={styles.value}>{profile.phone}</Text>
 
-        <Text style={styles.label}>Bio:</Text>
-        <Text style={styles.value}>{profile.bio}</Text>
-      </View>
+          <Text style={styles.label}>Bio:</Text>
+          <Text style={styles.value}>{profile.bio}</Text>
+        </View>
 
-      {/* Edit Profile Section */}
-      <Text style={styles.editHeader}>Edit Profile</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        value={profile.name}
-        onChangeText={(text) => setProfile({ ...profile, name: text })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        value={profile.email}
-        onChangeText={(text) => setProfile({ ...profile, email: text })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Phone"
-        value={profile.phone}
-        onChangeText={(text) => setProfile({ ...profile, phone: text })}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Bio"
-        value={profile.bio}
-        onChangeText={(text) => setProfile({ ...profile, bio: text })}
-      />
-      <Button title="Save Changes" onPress={() => alert('Profile updated successfully!')} />
-    </View>
+        {/* Edit Profile Section */}
+        <Text style={styles.editHeader}>Edit Profile</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Name"
+          value={profile.name}
+          onChangeText={(text) => setProfile({ ...profile, name: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          value={profile.email}
+          onChangeText={(text) => setProfile({ ...profile, email: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Phone"
+          value={profile.phone}
+          onChangeText={(text) => setProfile({ ...profile, phone: text })}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Bio"
+          value={profile.bio}
+          onChangeText={(text) => setProfile({ ...profile, bio: text })}
+        />
+        <Button title="Save Changes" onPress={() => alert('Profile updated successfully!')} />
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
     backgroundColor: '#f5f5f5',
+    flexGrow: 1,
   },
   header: {
     fontSize: 24,
