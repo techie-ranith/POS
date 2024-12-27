@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Alert } from 'react-native';
 
 interface Item {
   name: string;
@@ -50,6 +50,35 @@ const BillingandSale: React.FC = () => {
     return items
       .reduce((total, item) => total + item.price * item.quantity, 0)
       .toFixed(2);
+  };
+
+  const confirmSale = async () => {
+    if (items.length === 0) {
+      Alert.alert('Error', 'No items to confirm!');
+      return;
+    }
+
+    // Replace the URL with your API endpoint
+    const apiUrl = 'https://your-api-endpoint.com/sales';
+
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'Sale confirmed successfully!');
+        clearAll(); // Clear the items after confirmation
+      } else {
+        Alert.alert('Error', 'Failed to confirm the sale. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while confirming the sale.');
+    }
   };
 
   return (
@@ -105,6 +134,10 @@ const BillingandSale: React.FC = () => {
             <Text style={styles.clearButtonText}>Clear All</Text>
           </TouchableOpacity>
         </View>
+
+        <TouchableOpacity style={styles.confirmButton} onPress={confirmSale}>
+          <Text style={styles.confirmButtonText}>Confirm</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -186,6 +219,18 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  confirmButton: {
+    backgroundColor: 'green',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
