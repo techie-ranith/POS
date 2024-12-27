@@ -99,6 +99,7 @@ const EmployeePage = () => {
               <View style={styles.buttonContainer}>
                 <Button
                   title="Edit"
+                  color= "#4CAF50"
                   onPress={() => handleSelectEmployee(item)}
                 />
                 <View style={{ width: 10 }} /> {/* Add spacing here */}
@@ -116,7 +117,7 @@ const EmployeePage = () => {
         ListEmptyComponent={<Text style={styles.noEmployeesText}>No employees found</Text>}
       />
 
-      <Button title="Add Employee" onPress={() => setIsAddModalVisible(true)} />
+      <Button title="Add Employee" color="#4CAF50" onPress={() => setIsAddModalVisible(true)} />
 
       <Modal visible={isModalVisible} transparent animationType="slide">
         <View style={styles.modalContainer}>

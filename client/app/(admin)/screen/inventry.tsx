@@ -84,7 +84,7 @@ const Inventory = () => {
             keyboardType="numeric"
             onChangeText={(text) => setNewItem({ ...newItem, quantity: parseInt(text) || 0 })}
           />
-          <Button title={editingIndex !== null ? 'Update Item' : 'Add Item'} onPress={addItem} color="#007BFF" />
+          <Button title={editingIndex !== null ? 'Update Item' : 'Add Item'} onPress={addItem} color="#4CAF50" />
         </View>
 
         <View style={styles.tableContainer}>

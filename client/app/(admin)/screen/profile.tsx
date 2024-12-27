@@ -60,7 +60,12 @@ const Profile = () => {
           value={profile.bio}
           onChangeText={(text) => setProfile({ ...profile, bio: text })}
         />
-        <Button title="Save Changes" onPress={() => alert('Profile updated successfully!')} />
+        <Button
+        title="Save Changes"
+        onPress={() => alert('Profile updated successfully!')}
+        color="#4CAF50"
+        />
+
       </ScrollView>
     </KeyboardAvoidingView>
   );
