@@ -1,7 +1,7 @@
 import { View, Text, TextInput, TouchableOpacity} from 'react-native';
 import { useState } from 'react';
 import { Link } from 'expo-router';
-
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -26,30 +26,32 @@ export default function LoginPage() {
         }),
       });
   
-      // Check if the response is successful
+  
       if (!response.ok) {
         const data = await response.json();
         alert(data.message || 'Login failed');
-        return;  // Exit early if login fails
+        return;  
       }
   
-      // Parse the response data
+    
       const data = await response.json();
-  
-      // If login is successful, store the token and handle redirection
+     
       if (data.token) {
-        alert('Login successful');
-        
-        // Store the token in localStorage or sessionStorage (depending on your needs)
-        localStorage.setItem('authToken', data.token);
-  
-        // Redirect user based on their role
+        // alert('Login successful');
+        AsyncStorage.setItem('token', data.token)
+        .then(() => {
+          console.log("Token stored successfully!");
+        })
+        AsyncStorage.setItem('role', data.role)
+        .then(() => {
+          console.log("Role stored successfully!");
+        })
         window.location.href = data.redirectTo;
       } else {
         alert('Failed to login');
       }
     } catch (error) {
-      // Handle errors (network issues, etc.)
+      
       console.error('Login error:', error);
       alert('An error occurred, please try again later');
     }

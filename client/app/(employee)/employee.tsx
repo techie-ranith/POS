@@ -1,7 +1,8 @@
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import  { useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { TouchableOpacity, Text } from 'react-native'; // Import TouchableOpacity and Text
+import { TouchableOpacity, Text } from 'react-native'; 
 
 import Overview from './screen/overview';
 import Inventry from './screen/inventry';
@@ -12,17 +13,20 @@ import Profile from './screen/profile';
 const Drawer = createDrawerNavigator();
 
 function RootStack() {
-  // Function to handle logout
-  const handleLogout = () => {
+  
+  const handleLogout = async () => {
     console.log("Logging out...");
-    // Add your logout logic here (e.g., clear session or navigate to login screen)
+    await AsyncStorage.removeItem('token');
+    window.location.href = '/auth/login';
+
+    
   };
 
-  // Custom button component with NativeWind's className prop
+ 
   const LogoutButton = () => {
     return (
       <TouchableOpacity
-        className="bg-red-500 p-2 rounded-full mr-4" // Tailwind className for styling
+        className="bg-red-500 p-2 rounded-full mr-4" 
         onPress={handleLogout}
       >
         <Text className="text-white font-bold text-base">Logout</Text>
@@ -73,6 +77,63 @@ function RootStack() {
 }
 
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+    const token = await AsyncStorage.getItem('token');
+    const role = await AsyncStorage.getItem('role')
+    if (!(role=="Employee"))
+    {
+      setIsAuthenticated(false);
+    }
+    else{
+  if (token) {
+   
+    const response = await fetch(`${process.env.EXPO_PUBLIC_API_URL}/api/verify-token`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`, 
+      },
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      console.log('Token is valid');
+      setIsAuthenticated(true);     
+    } else {
+      console.log('Invalid token');
+      setIsAuthenticated(false);
+     
+    }
+  } else {
+    console.log('No token found');
+    setIsAuthenticated(false);
+   
+  }
+    }
+     
+    };
+
+    checkAuth();
+  }, []);
+
+
+  if (!isAuthenticated) {
+    return (
+      <div className="flex justify-center items-center h-screen bg-black">
+      <div className="text-center">
+        <Text className="text-white">Not authorized. Please log in.</Text>
+        
+          <a className="text-blue-500 hover:underline" href='/auth/login'>Click here to log in</a>
+      
+      </div>
+    </div>
+  )
+  }
+
   return (
    
       <RootStack />
