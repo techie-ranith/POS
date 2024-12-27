@@ -58,7 +58,7 @@ const Inventory = () => {
         },
         body: JSON.stringify(pendingItems),
       });
-    
+
       if (response.ok) {
         setItems((prevItems) => [...prevItems, ...pendingItems]);
         setPendingItems([]);
@@ -68,13 +68,9 @@ const Inventory = () => {
         alert(`Failed to send data: ${errorData.message}`);
       }
     } catch (error) {
-      if (error instanceof Error) {
-        alert(`An error occurred: ${error.message}`);
-      } else {
-        alert("An unexpected error occurred.");
-      }
+      alert(`An error occurred: ${error.message}`);
     }
-    
+  };
 
   const clearAllItems = () => {
     setItems([]);
@@ -302,5 +298,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
 });
-}
+
 export default Inventory;
