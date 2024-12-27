@@ -96,19 +96,23 @@ const EmployeePage = () => {
               >
                 <Text style={styles.employeeName}>{item.name}</Text>
               </TouchableOpacity>
-              <Button
-                title="Edit"
-                onPress={() => handleSelectEmployee(item)}
-              />
-              <Button
-                title="Delete"
-                color="#FF3B30"
-                onPress={() => handleDelete(item.id)}
-              />
+              <View style={styles.buttonContainer}>
+                <Button
+                  title="Edit"
+                  onPress={() => handleSelectEmployee(item)}
+                />
+                <View style={{ width: 10 }} /> {/* Add spacing here */}
+                <Button
+                  title="Delete"
+                  color="#FF3B30"
+                  onPress={() => handleDelete(item.id)}
+                />
+              </View>
             </View>
             <Text style={styles.employeePosition}>{item.position}</Text>
           </View>
         )}
+        
         ListEmptyComponent={<Text style={styles.noEmployeesText}>No employees found</Text>}
       />
 
@@ -297,6 +301,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  
 });
 
 export default EmployeePage;
