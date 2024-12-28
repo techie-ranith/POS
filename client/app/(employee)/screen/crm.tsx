@@ -29,7 +29,7 @@ const Crm = () => {
   const [customerCounter, setCustomerCounter] = useState<number>(101); // Start counter at 101
 
   const generateCustomerId = () => {
-    const id = `CUST-${customerCounter}`;
+    const id = `C-${customerCounter}`;
     setCustomerCounter(customerCounter + 1); // Increment the counter
     return id;
   };
