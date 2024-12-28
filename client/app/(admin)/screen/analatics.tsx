@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import { Line, Bar, Pie } from 'react-chartjs-2';
+import { View, Text, StyleSheet } from 'react-native';
+import { Line, Bar, Pie, Doughnut, Radar, PolarArea } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,6 +12,7 @@ import {
   Legend,
   ArcElement,
   BarElement,
+  RadialLinearScale,
 } from 'chart.js';
 
 ChartJS.register(
@@ -23,7 +24,8 @@ ChartJS.register(
   Tooltip,
   Legend,
   ArcElement,
-  BarElement
+  BarElement,
+  RadialLinearScale
 );
 
 const Analytics = () => {
@@ -111,6 +113,91 @@ const Analytics = () => {
     },
   };
 
+  // Doughnut Chart: Monthly Gross Profit Margin
+  const doughnutData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    datasets: [
+      {
+        data: [40, 50, 60, 70, 65, 75],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'],
+      },
+    ],
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right' as const,
+      },
+      title: {
+        display: true,
+        text: 'Monthly Gross Profit Margin (%)',
+      },
+    },
+  };
+
+  // Radar Chart: Net Sales by Gross Profit
+  const radarData = {
+    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    datasets: [
+      {
+        label: 'Net Sales',
+        data: [12000, 15000, 17000, 21000, 19000, 22000],
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 2,
+      },
+      {
+        label: 'Gross Profit',
+        data: [8000, 10000, 12000, 14000, 13000, 16000],
+        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+        borderColor: 'rgba(255, 99, 132, 1)',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const radarOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right' as const,
+      },
+      title: {
+        display: true,
+        text: 'Net Sales by Gross Profit',
+      },
+    },
+  };
+
+  // Polar Area Chart: Net Sales by Gross Profit Category
+  const polarData = {
+    labels: ['Category A', 'Category B', 'Category C', 'Category D'],
+    datasets: [
+      {
+        data: [20000, 15000, 25000, 18000],
+        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0'],
+      },
+    ],
+  };
+
+  const polarOptions = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'right' as const,
+      },
+      title: {
+        display: true,
+        text: 'Net Sales by Gross Profit Category',
+      },
+    },
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Analytics</Text>
@@ -124,6 +211,15 @@ const Analytics = () => {
         <View style={styles.chartBox}>
           <Bar data={barData} options={barOptions} />
         </View>
+        <View style={styles.chartBox}>
+          <Doughnut data={doughnutData} options={doughnutOptions} />
+        </View>
+        <View style={styles.chartBox}>
+          <Radar data={radarData} options={radarOptions} />
+        </View>
+        <View style={styles.chartBox}>
+          <PolarArea data={polarData} options={polarOptions} />
+        </View>
       </View>
     </View>
   );
@@ -132,7 +228,7 @@ const Analytics = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
+    padding: 1,
     backgroundColor: '#f8f9fa',
     alignItems: 'center',
   },
@@ -147,17 +243,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   chartBox: {
-    width: '45%', // Adjust to ensure all charts fit on one screen
-    height: 200,
-    margin: 10,
+    width: '30%', // Adjust to ensure all charts fit on one screen
+    height: 350,
+    margin:7,
     backgroundColor: 'white',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 10,
+    padding: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 5,
     elevation: 5,
   },
