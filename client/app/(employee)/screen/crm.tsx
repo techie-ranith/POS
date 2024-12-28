@@ -134,16 +134,14 @@ const Crm = () => {
                   </View>
                   <View style={styles.actionButtons}>
                     <TouchableOpacity
-                      style={[styles.button, styles.editButton]}
                       onPress={() => editCustomer(index)}
                     >
-                      <Text style={styles.buttonText}>Edit</Text>
+                      <Text style={styles.editButtonText}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.button, styles.deleteButton]}
                       onPress={() => deleteCustomer(index)}
                     >
-                      <Text style={styles.buttonText}>Delete</Text>
+                      <Text style={styles.deleteButtonText}>Delete</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -241,11 +239,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-around',
   },
-  editButton: {
-    backgroundColor: '#ffc107',
+  editButtonText: {
+    color: '#ffc107',
+    fontWeight: 'bold',
   },
-  deleteButton: {
-    backgroundColor: '#dc3545',
+  deleteButtonText: {
+    color: '#dc3545',
+    fontWeight: 'bold',
   },
   noCustomersText: {
     textAlign: 'center',
