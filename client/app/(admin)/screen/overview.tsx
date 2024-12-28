@@ -56,7 +56,7 @@ const SalesChart: React.FC = () => {
         display: true,
         text: "Monthly Sales Performance",
         font: {
-          size: 16,
+          size: 12,
           weight: "bold",
         },
       },
@@ -67,7 +67,7 @@ const SalesChart: React.FC = () => {
           display: true,
           text: "Month",
           font: {
-            size: 12,
+            size: 10,
           },
         },
       },
@@ -76,7 +76,7 @@ const SalesChart: React.FC = () => {
           display: true,
           text: "Sales (in LKR)",
           font: {
-            size: 12,
+            size: 10,
           },
         },
         ticks: {
@@ -116,7 +116,7 @@ const SalesChart: React.FC = () => {
         display: true,
         text: "Age Demographic of Consumers",
         font: {
-          size: 16,
+          size: 12,
           weight: "bold",
         },
       },
@@ -148,7 +148,7 @@ const SalesChart: React.FC = () => {
         display: true,
         text: "Tax Collected Per Year",
         font: {
-          size: 16,
+          size: 12,
           weight: "bold",
         },
       },
@@ -159,7 +159,7 @@ const SalesChart: React.FC = () => {
           display: true,
           text: "Year",
           font: {
-            size: 12,
+            size: 10,
           },
         },
       },
@@ -168,7 +168,7 @@ const SalesChart: React.FC = () => {
           display: true,
           text: "Tax Collected (in LKR)",
           font: {
-            size: 12,
+            size: 10,
           },
         },
         ticks: {
@@ -178,75 +178,21 @@ const SalesChart: React.FC = () => {
     },
   };
 
-  // Horizontal Bar Chart Data for Payment Method Breakdown
-  const paymentData = {
-    labels: ["Credit Card", "Debit Card", "PayPal", "Bank Transfer", "Cash"],
-    datasets: [
-      {
-        label: "Payment Method Breakdown",
-        data: [40, 30, 15, 10, 5],
-        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
-      },
-    ],
-  };
-
-  const paymentOptions: ChartOptions<"bar"> = {
-    responsive: true,
-    indexAxis: 'y', // This makes the bar chart horizontal
-    plugins: {
-      legend: {
-        display: true,
-        position: "top",
-      },
-      title: {
-        display: true,
-        text: "Payment Method Breakdown",
-        font: {
-          size: 16,
-          weight: "bold",
-        },
-      },
-    },
-    scales: {
-      x: {
-        title: {
-          display: true,
-          text: "Percentage (%)",
-          font: {
-            size: 12,
-          },
-        },
-        ticks: {
-          callback: (value: number | string) => `${value}%`,
-        },
-      },
-      y: {
-        title: {
-          display: true,
-          text: "Payment Method",
-          font: {
-            size: 12,
-          },
-        },
-      },
-    },
-  };
-  
   return (
-    <div className="h-screen overflow-y-auto bg-gray-50">
-      <h1 className="text-3xl font-bold text-center py-4">Retail Store Dashboard</h1>
-      <div className="flex flex-col items-center space-y-6">
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
+    <div className="h-screen flex flex-col items-center bg-gray-50">
+      <h1 className="text-2xl font-bold py-2">Retail Store Dashboard</h1>
+      <div className="grid grid-cols-2 gap-4 items-center justify-center h-full w-full max-w-5xl">
+        <div className="bg-white p-2 rounded shadow">
           <Line data={lineData} options={lineOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[60%] lg:w-[40%] bg-white p-4 rounded shadow">
+        <div className="bg-white p-2 rounded shadow">
           <Pie data={pieData} options={pieOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
+        <div className="bg-white p-2 rounded shadow">
           <Bar data={barData} options={barOptions} />
         </div>
-        <div className="w-[70%] sm:w-[90%] md:w-[80%] lg:w-[60%] bg-white p-4 rounded shadow">
-          <Bar data={paymentData} options={paymentOptions} />
+        <div className="bg-white p-2 rounded shadow">
+          <Bar data={barData} options={barOptions} />
         </div>
       </div>
     </div>
