@@ -1,180 +1,318 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, Alert, StyleSheet } from 'react-native';
+import React from 'react';
+import { View, Text, StyleSheet, TextInput, FlatList, TouchableOpacity, Alert } from 'react-native';
 
-type Item = {
-  id: string;
+interface Item {
   name: string;
-  pricePerUnit: number;
-  weight: number;
-  totalPrice: number;
-};
+  price: number;
+  quantity: number;
+}
 
-const BillingAndScale = () => {
-  const [itemName, setItemName] = useState('');
-  const [itemPrice, setItemPrice] = useState('');
-  const [itemWeight, setItemWeight] = useState('');
-  const [items, setItems] = useState<Item[]>([]);
+const BillingandSale: React.FC = () => {
+  const [items, setItems] = React.useState<Item[]>([]);
+  const [itemName, setItemName] = React.useState('');
+  const [itemPrice, setItemPrice] = React.useState('');
+  const [itemQuantity, setItemQuantity] = React.useState('');
+  const [invoice, setInvoice] = React.useState<any>(null); // To store the invoice data
+  const [editIndex, setEditIndex] = React.useState<number | null>(null); // To track which item is being edited
 
-  const handleAddItem = () => {
-    if (!itemName || !itemPrice || !itemWeight) {
-      Alert.alert('Error', 'Please fill in all fields.');
+  const handlePriceChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9.]/g, '');
+    if (!numericValue.includes('.') || numericValue.match(/\./g)?.length === 1) {
+      setItemPrice(numericValue);
+    }
+  };
+
+  const handleQuantityChange = (text: string) => {
+    const numericValue = text.replace(/[^0-9]/g, ''); // Only allow numbers
+    setItemQuantity(numericValue);
+  };
+
+  const addItem = () => {
+    if (itemName && itemPrice && itemQuantity) {
+      const newItem = { name: itemName, price: parseFloat(itemPrice), quantity: parseInt(itemQuantity, 10) };
+      if (editIndex !== null) {
+        // Edit existing item
+        const updatedItems = [...items];
+        updatedItems[editIndex] = newItem;
+        setItems(updatedItems);
+        setEditIndex(null); // Reset edit mode
+      } else {
+        // Add new item
+        setItems([...items, newItem]);
+      }
+      setItemName('');
+      setItemPrice('');
+      setItemQuantity('');
+    }
+  };
+
+  const deleteItem = (index: number) => {
+    const updatedItems = items.filter((_, i) => i !== index);
+    setItems(updatedItems);
+  };
+
+  const editItem = (index: number) => {
+    const item = items[index];
+    setItemName(item.name);
+    setItemPrice(item.price.toString());
+    setItemQuantity(item.quantity.toString());
+    setEditIndex(index); // Set the index of the item being edited
+  };
+
+  const clearAll = () => {
+    setItems([]);
+    setInvoice(null); // Clear invoice data as well
+  };
+
+  const calculateTotal = () => {
+    return items
+      .reduce((total, item) => total + item.price * item.quantity, 0)
+      .toFixed(2);
+  };
+
+  const confirmSale = async () => {
+    if (items.length === 0) {
+      Alert.alert('Error', 'No items to confirm!');
       return;
     }
 
-    const pricePerUnit = parseFloat(itemPrice);
-    const weight = parseFloat(itemWeight);
-
-    if (isNaN(pricePerUnit) || isNaN(weight)) {
-      Alert.alert('Error', 'Price and weight must be numeric values.');
-      return;
-    }
-
-    const totalPrice = pricePerUnit * weight;
-    const newItem: Item = {
-      id: Date.now().toString(),
-      name: itemName,
-      pricePerUnit,
-      weight,
-      totalPrice,
+    // Create an invoice object
+    const invoiceData = {
+      items,
+      total: calculateTotal(),
+      date: new Date().toLocaleString(),
     };
 
-    setItems((prevItems) => [...prevItems, newItem]);
-    setItemName('');
-    setItemPrice('');
-    setItemWeight('');
-  };
+    setInvoice(invoiceData); // Set the invoice state
 
-  const handleReset = () => {
-    setItems([]);
-  };
+    // Optionally, send the invoice data to a server for PDF generation or email
+    const apiUrl = 'https://your-api-endpoint.com/sales';
 
-  const renderItem = ({ item }: { item: Item }) => (
-    <View style={styles.itemRow}>
-      <Text style={styles.itemText}>{item.name}</Text>
-      <Text style={styles.itemText}>{item.pricePerUnit.toFixed(2)}</Text>
-      <Text style={styles.itemText}>{item.weight.toFixed(2)}</Text>
-      <Text style={styles.itemText}>{item.totalPrice.toFixed(2)}</Text>
-    </View>
-  );
+    try {
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items }),
+      });
+
+      if (response.ok) {
+        Alert.alert('Success', 'Sale confirmed successfully!');
+        clearAll(); // Clear the items after confirmation
+      } else {
+        Alert.alert('Error', 'Failed to confirm the sale. Please try again.');
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred while confirming the sale.');
+    }
+  };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Billing & Scale System</Text>
+    <View style={styles.screen}>
+      <View style={styles.card}>
+        <Text style={styles.header}>Billing and Sale</Text>
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Item Name"
+            value={itemName}
+            onChangeText={setItemName}
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Item Price"
+            value={itemPrice}
+            onChangeText={handlePriceChange}
+            keyboardType="numeric"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Quantity"
+            value={itemQuantity}
+            onChangeText={handleQuantityChange}
+            keyboardType="numeric"
+          />
+          <TouchableOpacity style={styles.addButton} onPress={addItem}>
+            <Text style={styles.addButtonText}>{editIndex !== null ? 'Update Item' : 'Add Item'}</Text>
+          </TouchableOpacity>
+        </View>
 
-      {/* Input Fields */}
-      <TextInput
-        placeholder="Item Name"
-        value={itemName}
-        onChangeText={setItemName}
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Price per kg (Rs.)"
-        value={itemPrice}
-        onChangeText={setItemPrice}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-      <TextInput
-        placeholder="Weight (kg)"
-        value={itemWeight}
-        onChangeText={setItemWeight}
-        keyboardType="numeric"
-        style={styles.input}
-      />
-
-      <TouchableOpacity onPress={handleAddItem} style={styles.addButton}>
-        <Text style={styles.buttonText}>Add Item</Text>
-      </TouchableOpacity>
-
-      {/* Item List */}
-      <FlatList
-        data={items}
-        keyExtractor={(item) => item.id}
-        renderItem={renderItem}
-        ListHeaderComponent={() =>
-          items.length > 0 && (
-            <View style={styles.headerRow}>
-              <Text style={styles.headerText}>Name</Text>
-              <Text style={styles.headerText}>Price/kg</Text>
-              <Text style={styles.headerText}>Weight</Text>
-              <Text style={styles.headerText}>Total</Text>
+        <FlatList
+          data={items}
+          keyExtractor={(_, index) => index.toString()}
+          renderItem={({ item, index }) => (
+            <View style={styles.listItem}>
+              <Text style={styles.listText}>{item.name}</Text>
+              <Text style={styles.listText}>
+                LKR {item.price.toFixed(2)} x {item.quantity} = LKR{' '}
+                {(item.price * item.quantity).toFixed(2)}
+              </Text>
+              <View style={styles.itemButtons}>
+                <TouchableOpacity onPress={() => editItem(index)}>
+                  <Text style={styles.editButton}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteItem(index)}>
+                  <Text style={styles.deleteButton}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          )
-        }
-      />
+          )}
+        />
 
-      {/* Actions */}
-      {items.length > 0 && (
-        <TouchableOpacity onPress={handleReset} style={styles.resetButton}>
-          <Text style={styles.buttonText}>Reset</Text>
+        <View style={styles.totalContainer}>
+          <Text style={styles.totalText}>Total: LKR {calculateTotal()}</Text>
+          <TouchableOpacity style={styles.clearButton} onPress={clearAll}>
+            <Text style={styles.clearButtonText}>Clear All</Text>
+          </TouchableOpacity>
+        </View>
+
+        <TouchableOpacity style={styles.confirmButton} onPress={confirmSale}>
+          <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
+      </View>
+
+      {invoice && (
+        <View style={styles.invoiceContainer}>
+          <Text style={styles.invoiceHeader}>Invoice</Text>
+          <Text>Date: {invoice.date}</Text>
+          {invoice.items.map((item: Item, index: number) => (
+            <Text key={index}>
+              {item.name} - LKR {item.price.toFixed(2)} x {item.quantity} = LKR{' '}
+              {(item.price * item.quantity).toFixed(2)}
+            </Text>
+          ))}
+          <Text style={styles.invoiceTotal}>Total: LKR {invoice.total}</Text>
+        </View>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f9f9f9',
+    backgroundColor: '#f5f5f5',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  title: {
+  card: {
+    width: '90%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  header: {
     fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
     textAlign: 'center',
-    marginBottom: 16,
+  },
+  inputContainer: {
+    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 8,
-    marginBottom: 8,
+    padding: 10,
+    marginBottom: 10,
+    borderRadius: 5,
+    backgroundColor: '#f9f9f9',
   },
   addButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#007bff',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 5,
     alignItems: 'center',
-    marginBottom: 16,
   },
-  buttonText: {
+  addButtonText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
-  itemRow: {
+  listItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 8,
+    padding: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ccc',
   },
-  itemText: {
-    flex: 1,
-    textAlign: 'center',
+  listText: {
+    fontSize: 16,
   },
-  headerRow: {
+  itemButtons: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 2,
-    borderBottomColor: '#000',
   },
-  headerText: {
-    flex: 1,
-    textAlign: 'center',
-    fontWeight: 'bold',
+  editButton: {
+    color: 'blue',
+    fontSize: 14,
+    marginRight: 10,
   },
-  resetButton: {
-    backgroundColor: '#ff9800',
-    padding: 12,
-    borderRadius: 8,
+  deleteButton: {
+    color: 'red',
+    fontSize: 14,
+  },
+  totalContainer: {
+    marginTop: 20,
     alignItems: 'center',
-    marginTop: 16,
+  },
+  totalText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  clearButton: {
+    backgroundColor: 'red',
+    padding: 10,
+    borderRadius: 5,
+  },
+  clearButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  confirmButton: {
+    backgroundColor: 'green',
+    padding: 15,
+    borderRadius: 5,
+    marginTop: 10,
+    alignItems: 'center',
+  },
+  confirmButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  invoiceContainer: {
+    marginTop: 20,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%',
+  },
+  invoiceHeader: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  invoiceTotal: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
-export default BillingAndScale;
+export default BillingandSale;
