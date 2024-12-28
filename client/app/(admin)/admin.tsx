@@ -11,6 +11,7 @@ import Discount from './screen/discount';
 import Crm from './screen/crm';
 import BillingandSale from './screen/billingandsales';
 import Profile from './screen/profile';
+import Analytics from './screen/analatics';
 import jwtDecode from 'jwt-decode';
 
 
@@ -97,6 +98,13 @@ function RootStack() {
       <Drawer.Screen 
         name="BillingandSale" 
         component={BillingandSale} 
+        options={{
+          headerRight: () => <LogoutButton />
+        }} 
+      />
+      <Drawer.Screen 
+        name="Analytics" 
+        component={Analytics} 
         options={{
           headerRight: () => <LogoutButton />
         }} 
