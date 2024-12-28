@@ -11,6 +11,7 @@ import {
 import TableComponent from '@/components/table';
 
 type Customer = {
+  customerId: string;
   name: string;
   email: string;
   phone: string;
@@ -18,8 +19,15 @@ type Customer = {
 
 const Crm = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [newCustomer, setNewCustomer] = useState<Customer>({ name: '', email: '', phone: '' });
+  const [newCustomer, setNewCustomer] = useState<Customer>({
+    customerId: '',
+    name: '',
+    email: '',
+    phone: '',
+  });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+
+  const generateCustomerId = () => `CUST-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 
   const addCustomer = () => {
     if (newCustomer.name && newCustomer.email && newCustomer.phone) {
@@ -29,9 +37,12 @@ const Crm = () => {
         setCustomers(updatedCustomers);
         setEditingIndex(null);
       } else {
-        setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+        setCustomers((prevCustomers) => [
+          ...prevCustomers,
+          { ...newCustomer, customerId: generateCustomerId() },
+        ]);
       }
-      setNewCustomer({ name: '', email: '', phone: '' });
+      setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
     } else {
       alert('Please fill in all fields.');
     }
@@ -46,20 +57,25 @@ const Crm = () => {
     const updatedCustomers = customers.filter((_, i) => i !== index);
     setCustomers(updatedCustomers);
     if (editingIndex === index) {
-      setNewCustomer({ name: '', email: '', phone: '' });
+      setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
       setEditingIndex(null);
     }
   };
 
   const clearAllCustomers = () => {
     setCustomers([]);
-    setNewCustomer({ name: '', email: '', phone: '' });
+    setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
     setEditingIndex(null);
   };
 
   const caption = 'Customer Management';
-  const headers = ['Name', 'Email', 'Phone'];
-  const data = customers.map((customer) => [customer.name, customer.email, customer.phone]);
+  const headers = ['Customer ID', 'Name', 'Email', 'Phone'];
+  const data = customers.map((customer) => [
+    customer.customerId,
+    customer.name,
+    customer.email,
+    customer.phone,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -105,6 +121,7 @@ const Crm = () => {
               renderItem={({ item, index }) => (
                 <View style={styles.listItem}>
                   <View style={styles.listItemText}>
+                    <Text style={styles.listItemField}>Customer ID: {item.customerId}</Text>
                     <Text style={styles.listItemField}>Name: {item.name}</Text>
                     <Text style={styles.listItemField}>Email: {item.email}</Text>
                     <Text style={styles.listItemField}>Phone: {item.phone}</Text>
@@ -129,7 +146,10 @@ const Crm = () => {
           )}
         </ScrollView>
         {customers.length > 0 && (
-          <TouchableOpacity style={[styles.button, styles.clearAllButton]} onPress={clearAllCustomers}>
+          <TouchableOpacity
+            style={[styles.button, styles.clearAllButton]}
+            onPress={clearAllCustomers}
+          >
             <Text style={styles.buttonText}>Clear All</Text>
           </TouchableOpacity>
         )}
