@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
   tableComponentContainer: {
     flex: 1,
     padding: 10,
-    marginTop: 25,
+    marginTop: 200,
     maxHeight: 250,
   },
 });
