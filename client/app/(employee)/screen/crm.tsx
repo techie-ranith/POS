@@ -181,12 +181,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 8,
-    marginRight: 10,
+    marginRight: 16,
     elevation: 5,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 5, height: 2 },
   },
   header: {
     fontSize: 28,
@@ -252,9 +252,12 @@ const styles = StyleSheet.create({
     color: '#888',
     fontSize: 16,
   },
+
   tableComponentContainer: {
     flex: 1,
     padding: 10,
+    marginTop: 25,
+    maxHeight: 250,
   },
 });
 
