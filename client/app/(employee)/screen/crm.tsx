@@ -26,8 +26,13 @@ const Crm = () => {
     phone: '',
   });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [customerCounter, setCustomerCounter] = useState<number>(101); // Start counter at 101
 
-  const generateCustomerId = () => `CUST-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
+  const generateCustomerId = () => {
+    const id = `CUST-${customerCounter}`;
+    setCustomerCounter(customerCounter + 1); // Increment the counter
+    return id;
+  };
 
   const addCustomer = () => {
     if (newCustomer.name && newCustomer.email && newCustomer.phone) {
@@ -66,6 +71,7 @@ const Crm = () => {
     setCustomers([]);
     setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
     setEditingIndex(null);
+    setCustomerCounter(101); // Reset the counter
   };
 
   const caption = 'Customer Management';
