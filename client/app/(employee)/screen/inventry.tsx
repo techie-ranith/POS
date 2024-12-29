@@ -14,7 +14,7 @@ const Inventory = () => {
   const [pendingItems, setPendingItems] = useState<Item[]>([]);
   const [newItem, setNewItem] = useState<Item>({ itemid: 0, name: '', category: '', quantity: 0 });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
-  const [nextItemId, setNextItemId] = useState(1); // This will track the next item ID to assign.
+  const [nextItemId, setNextItemId] = useState(1);
 
   const addItem = () => {
     if (newItem.name && newItem.category && newItem.quantity > 0) {
@@ -28,7 +28,7 @@ const Inventory = () => {
           ...prevItems,
           { ...newItem, itemid: nextItemId },
         ]);
-        setNextItemId((prevId) => prevId + 1); // Increment the ID for the next item
+        setNextItemId((prevId) => prevId + 1); 
       }
       setNewItem({ itemid: 0, name: '', category: '', quantity: 0 });
     } else {
@@ -51,21 +51,16 @@ const Inventory = () => {
   };
 
   const confirmChanges = () => {
-    // Sort the pending items by itemid before confirming
     const sortedPendingItems = [...pendingItems].sort((a, b) => a.itemid - b.itemid);
     
-    // Add the sorted pending items to the items list
     setItems((prevItems) => {
       const updatedItems = [...prevItems, ...sortedPendingItems];
       
-      // After adding, update the nextItemId to the last item's ID + 1
       const lastItem = updatedItems[updatedItems.length - 1];
-      setNextItemId(lastItem ? lastItem.itemid + 1 : 1); // Ensure nextItemId is correctly updated
+      setNextItemId(lastItem ? lastItem.itemid + 1 : 1); 
 
       return updatedItems;
     });
-
-    // Clear pending items and reset new item
     setPendingItems([]);
     alert('Changes confirmed!');
   };
@@ -80,7 +75,6 @@ const Inventory = () => {
 
   return (
     <View style={styles.container}>
-      {/* Inventory Management Section */}
       <View style={styles.card}>
         <Text style={styles.header}>Inventory Management</Text>
 
