@@ -17,11 +17,11 @@
     "validator": "^13.12.0"
   },
   "scripts": {
-    "start": "nodemon server.js",
-    "build": "tsc && echo Build completed successfully!",
+    "start": "node init && nodemon server.js",
+    "build": "node init && tsc && echo Build completed successfully!",
     "test": "echo \"No test specified\" && exit 1",
     "lint": "eslint .",
-    "dev": "nodemon --exec ts-node server.js"
+    "dev": "node init && nodemon --exec ts-node server.js"
   },
   "name": "server",
   "version": "1.0.0",
