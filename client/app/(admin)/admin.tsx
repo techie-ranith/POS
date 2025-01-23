@@ -12,6 +12,7 @@ import Crm from './screen/crm';
 import BillingandSale from './screen/billingandsales';
 import Profile from './screen/profile';
 import jwtDecode from 'jwt-decode';
+import Addemployee from './screen/addemployee'
 
 
 import {
@@ -40,10 +41,10 @@ function RootStack() {
   const LogoutButton = () => {
     return (
       <TouchableOpacity
-        className="bg-red-500 p-2 rounded-full mr-4" 
+        className="p-2 mr-4 bg-red-500 rounded-full" 
         onPress={handleLogout}
       >
-        <Text className="text-white font-bold text-base">Logout</Text>
+        <Text className="text-base font-bold text-white">Logout</Text>
       </TouchableOpacity>
     );
   };
@@ -69,6 +70,13 @@ function RootStack() {
       <Drawer.Screen 
         name="Crm" 
         component={Crm} 
+        options={{
+          headerRight: () => <LogoutButton />
+        }} 
+      />
+      <Drawer.Screen 
+        name="Addemployee" 
+        component={Addemployee} 
         options={{
           headerRight: () => <LogoutButton />
         }} 
@@ -160,7 +168,7 @@ export default function App() {
 
   if (!isAuthenticated) {
     return (
-      <div className="flex justify-center items-center h-screen bg-black">
+      <div className="flex items-center justify-center h-screen bg-black">
       <div className="text-center">
         <Text className="text-white">Not authorized. Please log in.</Text>
         
@@ -175,7 +183,7 @@ export default function App() {
   return (
     <>
       <RootStack />
-      <View className='felx items-end justify-center'>
+      <View className='items-end justify-center felx'>
       <Button
       size='lg'
       className='rounded-full border-2 p-3.5 mb-4 mr-4'
