@@ -11,6 +11,7 @@ import {
 import TableComponent from '@/components/table';
 
 type Customer = {
+  customerId: string;
   name: string;
   email: string;
   phone: string;
@@ -18,8 +19,20 @@ type Customer = {
 
 const Crm = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [newCustomer, setNewCustomer] = useState<Customer>({ name: '', email: '', phone: '' });
+  const [newCustomer, setNewCustomer] = useState<Customer>({
+    customerId: '',
+    name: '',
+    email: '',
+    phone: '',
+  });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [customerCounter, setCustomerCounter] = useState<number>(101); // Start counter at 101
+
+  const generateCustomerId = () => {
+    const id = `C-${customerCounter}`;
+    setCustomerCounter(customerCounter + 1); // Increment the counter
+    return id;
+  };
 
   const addCustomer = () => {
     if (newCustomer.name && newCustomer.email && newCustomer.phone) {
@@ -29,9 +42,12 @@ const Crm = () => {
         setCustomers(updatedCustomers);
         setEditingIndex(null);
       } else {
-        setCustomers((prevCustomers) => [...prevCustomers, newCustomer]);
+        setCustomers((prevCustomers) => [
+          ...prevCustomers,
+          { ...newCustomer, customerId: generateCustomerId() },
+        ]);
       }
-      setNewCustomer({ name: '', email: '', phone: '' });
+      setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
     } else {
       alert('Please fill in all fields.');
     }
@@ -46,20 +62,26 @@ const Crm = () => {
     const updatedCustomers = customers.filter((_, i) => i !== index);
     setCustomers(updatedCustomers);
     if (editingIndex === index) {
-      setNewCustomer({ name: '', email: '', phone: '' });
+      setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
       setEditingIndex(null);
     }
   };
 
   const clearAllCustomers = () => {
     setCustomers([]);
-    setNewCustomer({ name: '', email: '', phone: '' });
+    setNewCustomer({ customerId: '', name: '', email: '', phone: '' });
     setEditingIndex(null);
+    setCustomerCounter(101); // Reset the counter
   };
 
   const caption = 'Customer Management';
-  const headers = ['Name', 'Email', 'Phone'];
-  const data = customers.map((customer) => [customer.name, customer.email, customer.phone]);
+  const headers = ['Customer ID', 'Name', 'Email', 'Phone'];
+  const data = customers.map((customer) => [
+    customer.customerId,
+    customer.name,
+    customer.email,
+    customer.phone,
+  ]);
 
   return (
     <View style={styles.container}>
@@ -105,22 +127,21 @@ const Crm = () => {
               renderItem={({ item, index }) => (
                 <View style={styles.listItem}>
                   <View style={styles.listItemText}>
+                    <Text style={styles.listItemField}>Customer ID: {item.customerId}</Text>
                     <Text style={styles.listItemField}>Name: {item.name}</Text>
                     <Text style={styles.listItemField}>Email: {item.email}</Text>
                     <Text style={styles.listItemField}>Phone: {item.phone}</Text>
                   </View>
                   <View style={styles.actionButtons}>
                     <TouchableOpacity
-                      style={[styles.button, styles.editButton]}
                       onPress={() => editCustomer(index)}
                     >
-                      <Text style={styles.buttonText}>Edit</Text>
+                      <Text style={styles.editButtonText}>Edit</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                      style={[styles.button, styles.deleteButton]}
                       onPress={() => deleteCustomer(index)}
                     >
-                      <Text style={styles.buttonText}>Delete</Text>
+                      <Text style={styles.deleteButtonText}>Delete</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
@@ -129,7 +150,10 @@ const Crm = () => {
           )}
         </ScrollView>
         {customers.length > 0 && (
-          <TouchableOpacity style={[styles.button, styles.clearAllButton]} onPress={clearAllCustomers}>
+          <TouchableOpacity
+            style={[styles.button, styles.clearAllButton]}
+            onPress={clearAllCustomers}
+          >
             <Text style={styles.buttonText}>Clear All</Text>
           </TouchableOpacity>
         )}
@@ -155,12 +179,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 20,
     borderRadius: 8,
-    marginRight: 10,
+    marginRight: 16,
     elevation: 5,
     shadowColor: '#000',
     shadowOpacity: 0.2,
     shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 5, height: 2 },
   },
   header: {
     fontSize: 28,
@@ -215,20 +239,25 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'space-around',
   },
-  editButton: {
-    backgroundColor: '#ffc107',
+  editButtonText: {
+    color: '#ffc107',
+    fontWeight: 'bold',
   },
-  deleteButton: {
-    backgroundColor: '#dc3545',
+  deleteButtonText: {
+    color: '#dc3545',
+    fontWeight: 'bold',
   },
   noCustomersText: {
     textAlign: 'center',
     color: '#888',
     fontSize: 16,
   },
+
   tableComponentContainer: {
     flex: 1,
     padding: 10,
+    marginTop: 200,
+    maxHeight: 250,
   },
 });
 

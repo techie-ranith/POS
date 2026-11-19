@@ -3,6 +3,7 @@ import { View, Text, TextInput, Button, FlatList, StyleSheet, TouchableOpacity, 
 import TableComponent from "@/components/table";
 
 type Item = {
+  itemid: number;
   name: string;
   category: string;
   quantity: number;
@@ -11,8 +12,9 @@ type Item = {
 const Inventory = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [pendingItems, setPendingItems] = useState<Item[]>([]);
-  const [newItem, setNewItem] = useState<Item>({ name: '', category: '', quantity: 0 });
+  const [newItem, setNewItem] = useState<Item>({ itemid: 0, name: '', category: '', quantity: 0 });
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
+  const [nextItemId, setNextItemId] = useState(1);
 
   const addItem = () => {
     if (newItem.name && newItem.category && newItem.quantity > 0) {
@@ -22,9 +24,13 @@ const Inventory = () => {
         setPendingItems(updatedItems);
         setEditingIndex(null);
       } else {
-        setPendingItems((prevItems) => [...prevItems, newItem]);
+        setPendingItems((prevItems) => [
+          ...prevItems,
+          { ...newItem, itemid: nextItemId },
+        ]);
+        setNextItemId((prevId) => prevId + 1); 
       }
-      setNewItem({ name: '', category: '', quantity: 0 });
+      setNewItem({ itemid: 0, name: '', category: '', quantity: 0 });
     } else {
       alert('Please fill in all fields with valid data.');
     }
@@ -44,32 +50,19 @@ const Inventory = () => {
     setPendingItems([]);
   };
 
-  const confirmChanges = async () => {
-    if (pendingItems.length === 0) {
-      alert("No items to confirm.");
-      return;
-    }
+  const confirmChanges = () => {
+    const sortedPendingItems = [...pendingItems].sort((a, b) => a.itemid - b.itemid);
+    
+    setItems((prevItems) => {
+      const updatedItems = [...prevItems, ...sortedPendingItems];
+      
+      const lastItem = updatedItems[updatedItems.length - 1];
+      setNextItemId(lastItem ? lastItem.itemid + 1 : 1); 
 
-    try {
-      const response = await fetch("https://example.com/api/inventory", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(pendingItems),
-      });
-
-      if (response.ok) {
-        setItems((prevItems) => [...prevItems, ...pendingItems]);
-        setPendingItems([]);
-        alert("Changes confirmed and data sent to the database!");
-      } else {
-        const errorData = await response.json();
-        alert(`Failed to send data: ${errorData.message}`);
-      }
-    } catch (error) {
-      alert(`An error occurred: $ {error.message}`);
-    }
+      return updatedItems;
+    });
+    setPendingItems([]);
+    alert('Changes confirmed!');
   };
 
   const clearAllItems = () => {
@@ -77,12 +70,11 @@ const Inventory = () => {
   };
 
   const caption = 'Inventory Screen';
-  const headers = ['Item Name', 'Category', 'Quantity'];
-  const data = items.map((item) => [item.name, item.category, item.quantity.toString()]);
+  const headers = ['Item ID', 'Item Name', 'Category', 'Quantity'];
+  const data = items.map((item) => [item.itemid.toString(), item.name, item.category, item.quantity.toString()]);
 
   return (
     <View style={styles.container}>
-      {/* Inventory Management Section */}
       <View style={styles.card}>
         <Text style={styles.header}>Inventory Management</Text>
 
@@ -116,6 +108,7 @@ const Inventory = () => {
           ) : (
             <ScrollView style={styles.scrollView}>
               <View style={styles.tableHeaderRow}>
+                <Text style={styles.tableHeaderCell}>Item ID</Text>
                 <Text style={styles.tableHeaderCell}>Item Name</Text>
                 <Text style={styles.tableHeaderCell}>Category</Text>
                 <Text style={styles.tableHeaderCell}>Quantity</Text>
@@ -127,6 +120,7 @@ const Inventory = () => {
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => (
                   <View style={styles.tableRow}>
+                    <Text style={styles.tableCell}>{item.itemid}</Text>
                     <Text style={styles.tableCell}>{item.name}</Text>
                     <Text style={styles.tableCell}>{item.category}</Text>
                     <Text style={styles.tableCell}>{item.quantity}</Text>

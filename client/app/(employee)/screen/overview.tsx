@@ -1,88 +1,257 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React from "react";
+import { Line, Pie, Bar } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement,
+  ChartOptions,
+} from "chart.js";
 
-const Overview = () => {
-  // Create Animated values for opacity, translation, and scale
-  const fadeAnim = useRef(new Animated.Value(0)).current; // For fade-in effect
-  const translateX = useRef(new Animated.Value(-300)).current; // For sliding from left
-  const scaleAnim = useRef(new Animated.Value(0.5)).current; // For scaling
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  BarElement
+);
 
-  useEffect(() => {
-    // Run both the fade-in and slide-in with scaling animation at the same time
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1, // End opacity to 1
-        duration: 1500, // Duration for fade-in
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateX, {
-        toValue: 0, // Slide element to its original position
-        duration: 1500, // Duration for sliding
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleAnim, {
-        toValue: 1, // Scale to original size
-        duration: 1500, // Duration for scaling
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, [fadeAnim, translateX, scaleAnim]);
+const SalesChart: React.FC = () => {
+  // Chart data and options remain the same as in the original code.
+
+  // Line Chart Data
+  const lineData = {
+    labels: ["January", "February", "March", "April", "May", "June"],
+    datasets: [
+      {
+        label: "Sales Performance",
+        data: [15000, 18000, 17000, 22000, 21000, 24000],
+        borderColor: "blue",
+        backgroundColor: "rgba(0, 123, 255, 0.5)",
+        borderWidth: 2,
+        pointBackgroundColor: "white",
+        pointBorderColor: "blue",
+        pointRadius: 5,
+        tension: 0.4,
+      },
+    ],
+  };
+
+  const lineOptions: ChartOptions<"line"> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Monthly Sales Performance",
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Month",
+          font: {
+            size: 12,
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Sales (in LKR)",
+          font: {
+            size: 12,
+          },
+        },
+        ticks: {
+          callback: (value: number | string) => `Rs ${value}`,
+        },
+      },
+    },
+  };
+
+  // Pie Chart Data
+  const pieData = {
+    labels: ["18-24", "25-34", "35-44", "45-54", "55+"],
+    datasets: [
+      {
+        label: "Age Demographic",
+        data: [30, 40, 15, 10, 5],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+        hoverBackgroundColor: [
+          "#FF6384CC",
+          "#36A2EBCC",
+          "#FFCE56CC",
+          "#4BC0C0CC",
+          "#9966FFCC",
+        ],
+      },
+    ],
+  };
+
+  const pieOptions: ChartOptions<"pie"> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "right",
+      },
+      title: {
+        display: true,
+        text: "Age Demographic of Consumers",
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+  };
+
+  // Bar Chart Data
+  const barData = {
+    labels: ["2019", "2020", "2021", "2022", "2023"],
+    datasets: [
+      {
+        label: "Tax Collected (LKR)",
+        data: [12000, 15000, 18000, 20000, 25000],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+        borderColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const barOptions: ChartOptions<"bar"> = {
+    responsive: true,
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Tax Collected Per Year",
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Year",
+          font: {
+            size: 12,
+          },
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Tax Collected (in LKR)",
+          font: {
+            size: 12,
+          },
+        },
+        ticks: {
+          callback: (value: number | string) => `Rs ${value}`,
+        },
+      },
+    },
+  };
+
+  const paymentData = {
+    labels: ["Credit Card", "Debit Card", "PayPal", "Bank Transfer", "Cash"],
+    datasets: [
+      {
+        label: "Payment Method Breakdown",
+        data: [40, 30, 15, 10, 5],
+        backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"],
+      },
+    ],
+  };
+
+  const paymentOptions: ChartOptions<"bar"> = {
+    responsive: true,
+    indexAxis: 'y', // This makes the bar chart horizontal
+    plugins: {
+      legend: {
+        display: true,
+        position: "top",
+      },
+      title: {
+        display: true,
+        text: "Payment Method Breakdown",
+        font: {
+          size: 16,
+          weight: "bold",
+        },
+      },
+    },
+    scales: {
+      x: {
+        title: {
+          display: true,
+          text: "Percentage (%)",
+          font: {
+            size: 12,
+          },
+        },
+        ticks: {
+          callback: (value: number | string) => `${value}%`,
+        },
+      },
+      y: {
+        title: {
+          display: true,
+          text: "Payment Method",
+          font: {
+            size: 12,
+          },
+        },
+      },
+    },
+  };
 
   return (
-    <View style={styles.container}>
-      <Animated.View
-        style={[
-          styles.card,
-          {
-            opacity: fadeAnim,
-            transform: [
-              { translateX: translateX }, // Apply sliding effect
-              { scale: scaleAnim }, // Apply scaling effect
-            ],
-          },
-        ]}
-      >
-        <Text style={styles.header}>Overview Page</Text>
-        <Text style={styles.text}>
-          Welcome to the overview page. Here, developers can find details on how to customize and implement this page for CRM purposes. Keep this clean and professional while ensuring interactivity.
-        </Text>
-      </Animated.View>
-    </View>
+    <div className="h-screen overflow-y-auto bg-gray-50 p-6">
+      <h1 className="text-3xl font-bold text-center py-4">Retail Store Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white p-4 rounded shadow">
+          <Line data={lineData} options={lineOptions} />
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <Pie data={pieData} options={pieOptions} />
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <Bar data={barData} options={barOptions} />
+        </div>
+        <div className="bg-white p-4 rounded shadow">
+          <Bar data={paymentData} options={paymentOptions} />
+        </div>
+      </div>
+    </div>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a', // Dark background for a techie feel
-    padding: 20,
-  },
-  card: {
-    backgroundColor: '#333', // Dark card for contrast
-    borderRadius: 8,
-    padding: 30,
-    width: '90%',
-    maxWidth: 500,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.3,
-    shadowRadius: 10,
-    elevation: 10,
-  },
-  header: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 15,
-    color: '#00ffcc', // Neon green for a tech vibe
-  },
-  text: {
-    fontSize: 16,
-    color: '#e0e0e0',
-    textAlign: 'center',
-  },
-});
-
-export default Overview;
+export default SalesChart;

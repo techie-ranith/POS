@@ -12,6 +12,8 @@ const BillingandSale: React.FC = () => {
   const [itemName, setItemName] = React.useState('');
   const [itemPrice, setItemPrice] = React.useState('');
   const [itemQuantity, setItemQuantity] = React.useState('');
+  const [invoice, setInvoice] = React.useState<any>(null); // To store the invoice data
+  const [editIndex, setEditIndex] = React.useState<number | null>(null); // To track which item is being edited
 
   const handlePriceChange = (text: string) => {
     const numericValue = text.replace(/[^0-9.]/g, '');
@@ -27,10 +29,17 @@ const BillingandSale: React.FC = () => {
 
   const addItem = () => {
     if (itemName && itemPrice && itemQuantity) {
-      setItems([
-        ...items,
-        { name: itemName, price: parseFloat(itemPrice), quantity: parseInt(itemQuantity, 10) },
-      ]);
+      const newItem = { name: itemName, price: parseFloat(itemPrice), quantity: parseInt(itemQuantity, 10) };
+      if (editIndex !== null) {
+        // Edit existing item
+        const updatedItems = [...items];
+        updatedItems[editIndex] = newItem;
+        setItems(updatedItems);
+        setEditIndex(null); // Reset edit mode
+      } else {
+        // Add new item
+        setItems([...items, newItem]);
+      }
       setItemName('');
       setItemPrice('');
       setItemQuantity('');
@@ -42,8 +51,17 @@ const BillingandSale: React.FC = () => {
     setItems(updatedItems);
   };
 
+  const editItem = (index: number) => {
+    const item = items[index];
+    setItemName(item.name);
+    setItemPrice(item.price.toString());
+    setItemQuantity(item.quantity.toString());
+    setEditIndex(index); // Set the index of the item being edited
+  };
+
   const clearAll = () => {
     setItems([]);
+    setInvoice(null); // Clear invoice data as well
   };
 
   const calculateTotal = () => {
@@ -58,7 +76,16 @@ const BillingandSale: React.FC = () => {
       return;
     }
 
-    // Replace the URL with your API endpoint
+    // Create an invoice object
+    const invoiceData = {
+      items,
+      total: calculateTotal(),
+      date: new Date().toLocaleString(),
+    };
+
+    setInvoice(invoiceData); // Set the invoice state
+
+    // Optionally, send the invoice data to a server for PDF generation or email
     const apiUrl = 'https://your-api-endpoint.com/sales';
 
     try {
@@ -107,7 +134,7 @@ const BillingandSale: React.FC = () => {
             keyboardType="numeric"
           />
           <TouchableOpacity style={styles.addButton} onPress={addItem}>
-            <Text style={styles.addButtonText}>Add Item</Text>
+            <Text style={styles.addButtonText}>{editIndex !== null ? 'Update Item' : 'Add Item'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -121,9 +148,14 @@ const BillingandSale: React.FC = () => {
                 LKR {item.price.toFixed(2)} x {item.quantity} = LKR{' '}
                 {(item.price * item.quantity).toFixed(2)}
               </Text>
-              <TouchableOpacity onPress={() => deleteItem(index)}>
-                <Text style={styles.deleteButton}>Delete</Text>
-              </TouchableOpacity>
+              <View style={styles.itemButtons}>
+                <TouchableOpacity onPress={() => editItem(index)}>
+                  <Text style={styles.editButton}>Edit</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => deleteItem(index)}>
+                  <Text style={styles.deleteButton}>Delete</Text>
+                </TouchableOpacity>
+              </View>
             </View>
           )}
         />
@@ -139,6 +171,20 @@ const BillingandSale: React.FC = () => {
           <Text style={styles.confirmButtonText}>Confirm</Text>
         </TouchableOpacity>
       </View>
+
+      {invoice && (
+        <View style={styles.invoiceContainer}>
+          <Text style={styles.invoiceHeader}>Invoice</Text>
+          <Text>Date: {invoice.date}</Text>
+          {invoice.items.map((item: Item, index: number) => (
+            <Text key={index}>
+              {item.name} - LKR {item.price.toFixed(2)} x {item.quantity} = LKR{' '}
+              {(item.price * item.quantity).toFixed(2)}
+            </Text>
+          ))}
+          <Text style={styles.invoiceTotal}>Total: LKR {invoice.total}</Text>
+        </View>
+      )}
     </View>
   );
 };
@@ -200,6 +246,14 @@ const styles = StyleSheet.create({
   listText: {
     fontSize: 16,
   },
+  itemButtons: {
+    flexDirection: 'row',
+  },
+  editButton: {
+    color: 'blue',
+    fontSize: 14,
+    marginRight: 10,
+  },
   deleteButton: {
     color: 'red',
     fontSize: 14,
@@ -234,6 +288,30 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  invoiceContainer: {
+    marginTop: 20,
+    backgroundColor: '#fff',
+    padding: 15,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
+    width: '90%',
+  },
+  invoiceHeader: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  invoiceTotal: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 10,
+    textAlign: 'center',
   },
 });
 
